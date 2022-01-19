@@ -1,3 +1,3 @@
-module "go.nandlabs.io/commons"
+module github.com/nandlabs/go-commons
 
 go 1.16
