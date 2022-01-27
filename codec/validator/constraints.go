@@ -44,206 +44,22 @@ Numerical Type Constraints
 */
 
 func min(val reflect.Value, typ reflect.Type, param string) error {
-	valid := true
-	switch typ.Kind() {
-	case reflect.Int:
-		c, err := convertInt(param, 0)
-		if err != nil {
-			return err
-		}
-		cInt := int(c)
-		in, _ := val.Interface().(int)
-		valid = in > cInt
-	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		/*c, err := convertInt(param)
-		if err != nil {
-			return err
-		}
-		in := val.Interface().(int8)
-		valid = in > c*/
-		valid = true
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		/*c, err := convertUint(param)
-		if err != nil {
-			return err
-		}
-		valid = input.Uint() < c*/
-		valid = true
-	case reflect.Float32:
-		/*c, err := convertFloat(param)
-		if err != nil {
-			return err
-		}
-		valid = input.Float() < c*/
-		valid = true
-	case reflect.Float64:
-		valid = true
-	}
-	if !valid {
-		return ErrMin
-	}
-	return nil
+	return checkMin(val, typ, param, false)
 }
 
 func max(val reflect.Value, typ reflect.Type, param string) error {
-	valid := true
-	switch typ.Kind() {
-	case reflect.Int:
-		c, err := convertInt(param, 0)
-		if err != nil {
-			return err
-		}
-		cInt := int(c)
-		in, _ := val.Interface().(int)
-		valid = in < cInt
-	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		/*c, err := convertInt(param)
-		if err != nil {
-			return err
-		}
-		in := val.Interface().(int8)
-		valid = in > c*/
-		valid = true
-	case reflect.Uint:
-		c, err := convertUint(param, 0)
-		if err != nil {
-			return err
-		}
-		cUint := uint(c)
-		in, _ := val.Interface().(uint)
-		valid = in < cUint
-		valid = true
-	case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		/*c, err := convertUint(param)
-		if err != nil {
-			return err
-		}
-		valid = input.Uint() < c*/
-		valid = true
-	case reflect.Float32:
-		c, err := convertFloat(param, 32)
-		if err != nil {
-			return err
-		}
-		cFloat := float32(c)
-		in, _ := val.Interface().(float32)
-		valid = in < cFloat
-	case reflect.Float64:
-		c, err := convertFloat(param, 64)
-		if err != nil {
-			return err
-		}
-		cFloat := c
-		in, _ := val.Interface().(float64)
-		valid = in < cFloat
-	}
-	if !valid {
-		return ErrMax
-	}
-	return nil
+	return checkMax(val, typ, param, false)
 }
 
 /**
 move the below functions to a generic function to consider the both min and exclusive-min
 */
 func exclusiveMin(val reflect.Value, typ reflect.Type, param string) error {
-	valid := true
-	switch typ.Kind() {
-	case reflect.Int:
-		c, err := convertInt(param, 0)
-		if err != nil {
-			return err
-		}
-		cInt := int(c)
-		in, _ := val.Interface().(int)
-		valid = in >= cInt
-	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		/*c, err := convertInt(param)
-		if err != nil {
-			return err
-		}
-		in := val.Interface().(int8)
-		valid = in > c*/
-		valid = true
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		/*c, err := convertUint(param)
-		if err != nil {
-			return err
-		}
-		valid = input.Uint() < c*/
-		valid = true
-	case reflect.Float32:
-		/*c, err := convertFloat(param)
-		if err != nil {
-			return err
-		}
-		valid = input.Float() < c*/
-		valid = true
-	case reflect.Float64:
-		valid = true
-	}
-	if !valid {
-		return ErrMin
-	}
-	return nil
+	return checkMin(val, typ, param, true)
 }
 
 func exclusiveMax(val reflect.Value, typ reflect.Type, param string) error {
-	valid := true
-	switch typ.Kind() {
-	case reflect.Int:
-		c, err := convertInt(param, 0)
-		if err != nil {
-			return err
-		}
-		cInt := int(c)
-		in, _ := val.Interface().(int)
-		valid = in <= cInt
-	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		/*c, err := convertInt(param)
-		if err != nil {
-			return err
-		}
-		in := val.Interface().(int8)
-		valid = in > c*/
-		valid = true
-	case reflect.Uint:
-		c, err := convertUint(param, 0)
-		if err != nil {
-			return err
-		}
-		cUint := uint(c)
-		in, _ := val.Interface().(uint)
-		valid = in <= cUint
-		valid = true
-	case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		/*c, err := convertUint(param)
-		if err != nil {
-			return err
-		}
-		valid = input.Uint() < c*/
-		valid = true
-	case reflect.Float32:
-		c, err := convertFloat(param, 32)
-		if err != nil {
-			return err
-		}
-		cFloat := float32(c)
-		in, _ := val.Interface().(float32)
-		valid = in <= cFloat
-	case reflect.Float64:
-		c, err := convertFloat(param, 64)
-		if err != nil {
-			return err
-		}
-		cFloat := c
-		in, _ := val.Interface().(float64)
-		valid = in <= cFloat
-	}
-	if !valid {
-		return ErrMax
-	}
-	return nil
+	return checkMax(val, typ, param, true)
 }
 
 func multipleOf(val reflect.Value, typ reflect.Type, param string) error {

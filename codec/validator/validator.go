@@ -19,6 +19,7 @@ type StructValidator struct {
 	tagName         string
 }
 
+//NewStructValidator TODO : integration with the codec
 func NewStructValidator() *StructValidator {
 	return &StructValidator{
 		validationFuncs: map[string]StructValidatorFunc{
