@@ -1,0 +1,7 @@
+go.nandlabs.io/commons v0.0.1/go.mod h1:0Kw+BDvFH+9gNscbr6nv4nvWUt3/JmAlSMxMNkHLLdk=
+go.nandlabs.io/l3 v0.0.1 h1:awmFMdP4PqkaRTImsEy0SAIb3MPcqG0dzvHM9i7tX/M=
+go.nandlabs.io/l3 v0.0.1/go.mod h1:N/29Imt7tv7TB9UJqHDxwrfmUDDGKuMMo8hQzTRGUQA=
+gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
+gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b h1:h8qDotaEPuJATrMmW04NCwg7v22aHH28wwpauUhK9Oo=
+gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
