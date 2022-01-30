@@ -25,7 +25,7 @@ func JsonRW(options map[string]interface{}) *JsonCodec {
 
 func (c *JsonCodec) Write(v interface{}, w io.Writer) error {
 	// marshal wrapper
-	// if the validation is successful then use the core json-codec marshal to generate the json-codec from the struct and write it back to the buffer
+	// if the validation is successful then use the core json marshal to generate the json-codec from the struct and write it back to the buffer
 	output, err := json.Marshal(v)
 	if err != nil {
 		// in case of error during marshaling
