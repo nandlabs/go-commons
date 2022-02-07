@@ -301,3 +301,19 @@ func TestEmptyStruct(t *testing.T) {
 		t.Errorf("Error in validation: %s", err)
 	}
 }
+
+type ConstExample struct {
+	Summary     string `json:"summary"`
+	Description string `json:"description" constraints:"required=false,nillable=false"`
+}
+
+func TestConstStruct(t *testing.T) {
+	msg := ConstExample{
+		Summary:     "testing",
+		Description: "this is testing",
+	}
+	sv := NewStructValidator()
+	if err := sv.Validate(msg); err != nil {
+		t.Errorf("Error in validation: %s", err)
+	}
+}
