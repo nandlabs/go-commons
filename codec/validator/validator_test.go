@@ -20,7 +20,7 @@ func TestRequiredConstraintFail(t *testing.T) {
 	sv := NewStructValidator()
 	err := sv.Validate(msg)
 	got := err.Error()
-	want := "mandatory field required not present"
+	want := "mandatory fields not present"
 	if got != want {
 		t.Errorf("Expected: %s, got: %s", got, want)
 	}
