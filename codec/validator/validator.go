@@ -48,7 +48,6 @@ func NewStructValidator() *StructValidator {
 }
 
 func (sv *StructValidator) Validate(v interface{}) error {
-	logger.Info("starting struct validation")
 	// add a logic to check for the empty struct input in order to skip the validation of the struct
 	if err := sv.deepFields(v); err != nil {
 		return err
