@@ -19,9 +19,9 @@ type XMLMessage struct {
 }
 
 type Message2 struct {
-	Name string `json:"name" constraints:"required=true,nillable=true,min-length=5"`
-	Body string `json:"body" constraints:"required=true,nillable=true,max-length=50"`
-	Time int64  `json:"time" constraints:"required=true,nillable=true,min=10"`
+	Name string `json:"name" constraints:"required=true;nillable=true;min-length=5"`
+	Body string `json:"body" constraints:"required=true;nillable=true;max-length=50"`
+	Time int64  `json:"time" constraints:"required=true;nillable=true;min=10"`
 }
 
 func TestNewJsonCodec(t *testing.T) {
