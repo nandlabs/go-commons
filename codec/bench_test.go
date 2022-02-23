@@ -6,11 +6,11 @@ import (
 )
 
 type BenchTestStruct struct {
-	Name        string  `json:"name" constraints:"required=true,nillable=true,min-length=5"`
-	Age         int     `json:"age" constraints:"required=true,nillable=true,min=21"`
-	Description string  `json:"description" constraints:"required=true,nillable=true,max-length=50"`
-	Cost        float64 `json:"cost" constraints:"required=true,nillable=true,exclusiveMin=200"`
-	ItemCount   int     `json:"itemCount" constraints:"required=true,nillable=true,multipleOf=5"`
+	Name        string  `json:"name" constraints:"required=true;nillable=true;min-length=5"`
+	Age         int     `json:"age" constraints:"required=true;nillable=true;min=21"`
+	Description string  `json:"description" constraints:"required=true;nillable=true;max-length=50"`
+	Cost        float64 `json:"cost" constraints:"required=true;nillable=true;exclusiveMin=200"`
+	ItemCount   int     `json:"itemCount" constraints:"required=true;nillable=true;multipleOf=5"`
 }
 
 func BenchmarkJsonCodec(b *testing.B) {
