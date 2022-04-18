@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"go.nandlabs.io/commons/codec/validator"
 	"io"
 	"io/ioutil"
 )
+
+var structValidator = validator.NewStructValidator()
 
 type JsonCodec struct {
 	//Json JsonCodec specific code will come here.
@@ -25,7 +28,10 @@ func JsonRW(options map[string]interface{}) *JsonCodec {
 
 func (c *JsonCodec) Write(v interface{}, w io.Writer) error {
 	// marshal wrapper
-	// if the validation is successful then use the core json-codec marshal to generate the json-codec from the struct and write it back to the buffer
+	// if the validation is successful then use the core json marshal to generate the json-codec from the struct and write it back to the buffer
+	if err := structValidator.Validate(v); err != nil {
+		return err
+	}
 	output, err := json.Marshal(v)
 	if err != nil {
 		// in case of error during marshaling
