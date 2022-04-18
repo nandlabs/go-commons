@@ -11,7 +11,7 @@ import (
 const (
 	JSON = "application/json"
 	XML  = "text/xml"
-	YAML = "text/x-yaml"
+	YAML = "text/yaml"
 )
 
 // StringEncoder Interface
@@ -82,6 +82,10 @@ func Get(contentType string, options map[string]interface{}) Codec {
 	case XML:
 		{
 			readerWriter = XmlRW(options)
+		}
+	case YAML:
+		{
+			readerWriter = YamlRW(options)
 		}
 	}
 
