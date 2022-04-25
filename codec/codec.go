@@ -72,6 +72,7 @@ type BaseCodec struct {
 	readerWriter ReaderWriter
 }
 
+//TODO Add error
 func Get(contentType string, options map[string]interface{}) Codec {
 	var readerWriter ReaderWriter
 	switch contentType {
