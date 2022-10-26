@@ -51,6 +51,30 @@ func TestDirExists(t *testing.T) {
 	}
 }
 
+func TestPathExists(t *testing.T) {
+	type args struct {
+		path string
+	}
+	wd, _ := os.Getwd()
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{name: "Existing Dir", args: struct{ path string }{path: wd + "/testdata"}, want: true},
+		{name: "Non Existing Dir", args: struct{ path string }{path: wd + "/test"}, want: false},
+		{name: "Existing File", args: struct{ path string }{path: wd + "/testdata/test.json"}, want: true},
+		{name: "Non Existing File", args: struct{ path string }{path: wd + "/testdata/unknown"}, want: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := PathExists(tt.args.path); got != tt.want {
+				t.Errorf("DirExists() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestLookupContentType(t *testing.T) {
 	type args struct {
 		path string

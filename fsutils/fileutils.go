@@ -46,6 +46,12 @@ func DirExists(path string) bool {
 	return fileInfo.IsDir()
 }
 
+//PathExisis will return a boolean if the file/diretory exists
+func PathExists(p string) bool {
+	_, err := os.Stat(p)
+	return !os.IsNotExist(err)
+}
+
 //LookupContentType will lookup ContentType based on the file extension.
 //This function will only check based on the name of the file and use the file extension.
 func LookupContentType(path string) string {
