@@ -46,7 +46,7 @@ func DirExists(path string) bool {
 	return fileInfo.IsDir()
 }
 
-//PathExisis will return a boolean if the file/diretory exists
+// PathExists  will return a boolean if the file/diretory exists
 func PathExists(p string) bool {
 	_, err := os.Stat(p)
 	return !os.IsNotExist(err)
