@@ -1,11 +1,12 @@
 package validator
 
 import (
-	"go.nandlabs.io/l3"
 	"reflect"
 	"regexp"
 	"strings"
 	"sync"
+
+	"go.nandlabs.io/commons/l3"
 )
 
 var logger = l3.Get()
