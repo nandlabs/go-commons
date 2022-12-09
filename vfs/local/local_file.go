@@ -93,9 +93,16 @@ func (o *OsFile) Delete() error {
 	return os.Remove(o.Location.Path)
 }
 
-func (o *OsFile) Find(filter vfs.FileFilter) ([]vfs.VFile, error) {
-
-	panic("implement me")
+func (o *OsFile) Find(filter vfs.FileFilter) (files []vfs.VFile, err error) {
+	err = o.fs.Walk(o.Location, func(file vfs.VFile) (err error) {
+		var filterPass bool
+		filterPass, err = filter(file)
+		if err == nil && filterPass {
+			files = append(files, file)
+		}
+		return
+	})
+	return
 }
 
 func (o *OsFile) Info() (vfs.VFileInfo, error) {
@@ -109,7 +116,7 @@ func (o *OsFile) Parent() (file vfs.VFile, err error) {
 		for _, info := range fileInfos {
 			var f *os.File
 			var u *url.URL
-			u, _ = o.Location.Parse("/../" + info.Name())
+			u, _ = o.Location.Parse("../" + info.Name())
 			f, err = os.Open(u.Path)
 			if err == nil {
 				file = &OsFile{

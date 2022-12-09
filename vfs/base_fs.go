@@ -163,28 +163,26 @@ func (b *BaseVFS) Walk(u *url.URL, fn WalkFn) (err error) {
 	if err == nil {
 		srcFi, err = src.Info()
 		if err == nil {
-			err = fn(src)
-			if err == nil {
-				if srcFi.IsDir() {
-					children, err = src.ListAll()
-					if err == nil {
-						for _, child := range children {
-							childInfo, err = child.Info()
-							if err == nil {
+			if srcFi.IsDir() {
+				children, err = src.ListAll()
+				if err == nil {
+					for _, child := range children {
+						childInfo, err = child.Info()
+						if err == nil {
 
-								if childInfo.IsDir() {
-									err = b.Walk(child.Url(), fn)
-								} else {
-									err = fn(child)
-								}
-								if err != nil {
-									break
-								}
+							if childInfo.IsDir() {
+								err = b.Walk(child.Url(), fn)
+							} else {
+								err = fn(child)
+							}
+							if err != nil {
+								break
 							}
 						}
 					}
 				}
 			}
+
 		}
 	}
 	return
