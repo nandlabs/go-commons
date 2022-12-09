@@ -17,16 +17,11 @@ func (b *BaseFile) AsString() (s string, err error) {
 	if err == nil {
 		s = string(bytes)
 	}
-
 	return
 }
 
-func (b *BaseFile) Bytes() ([]byte, error) {
+func (b *BaseFile) AsBytes() ([]byte, error) {
 	return ioutil.ReadAll(b)
-}
-
-func (b *BaseFile) WriteString(s string) (int, error) {
-	return io.WriteString(b, s)
 }
 
 func (b *BaseFile) DeleteMatching(filter FileFilter) (err error) {
@@ -51,4 +46,8 @@ func (b *BaseFile) DeleteMatching(filter FileFilter) (err error) {
 	}
 
 	return
+}
+
+func (b *BaseFile) WriteString(s string) (int, error) {
+	return io.WriteString(b, s)
 }

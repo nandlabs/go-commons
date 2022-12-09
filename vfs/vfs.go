@@ -4,37 +4,59 @@ import (
 	"net/url"
 )
 
+type WalkFn func(file VFile) error
+
 type VFileSystem interface {
-	//Copy files
-	Copy(src, dst string) error
-	//CopyAll files,directories recursivey
-	CopyAll(src, dst string) error
-	//CreateFile function
-	CreateFile(u *url.URL) (VFile, error)
-	//Create creates a file
-	Create(u string) (VFile, error)
+	//Copy File from one location to another. If the source resolves to a  directory, then all its nested children
+	//will be copied. The source and destination can be of different filesystems.
+	//Since the FS can be different it cannot guarantee to carry forward any symbolic links/shortcuts from source
+	//instead it may try to create regular files/directories for the same even if the source and destination have
+	//the same schemes
+	Copy(src, dst *url.URL) error
+	//CopyRaw is same as Copy except it accepts url as string
+	CopyRaw(src, dst string) error
+	//Create will create a new file this in the specified url. This is a
+	Create(u *url.URL) (VFile, error)
+	//CreateRaw is same as Create except it accepts the url as a string
+	CreateRaw(raw string) (VFile, error)
 	//Delete file . if the src resolves to a directory then all the files  and directories under this will be deleted
-	Delete(src string) error
-	//Exists indicates if this url exists in the file system
-	Exists(u *url.URL) (bool, error)
-	//FileExists function is same as Exists function, however it accepts the url as a string
-	FileExists(u string) (bool, error)
-	//List lists the file in
-	List(url string) ([]VFileInfo, error)
-	//ListFiles lists the file in the filesystem for a specific url
-	ListFiles(url string) ([]VFileInfo, error)
-	//Mkdir will create the directory and will throw an error if exists
-	Mkdir(u string) (VFile, error)
+	Delete(src *url.URL) error
+	//DeleteRaw is same as Delete except that it will accept url as a string
+	DeleteRaw(src string) error
+	//List function will list all the files if the type is a directory
+	List(url *url.URL) ([]VFile, error)
+	//ListRaw lists the file in the filesystem for a specific url
+	ListRaw(url string) ([]VFile, error)
+	//Mkdir will create the directory and will throw an error if exists or has permission issues or unable to create
+	Mkdir(u *url.URL) (VFile, error)
+	//MkdirRaw same as Mkdir, however it accepts  url as string
+	MkdirRaw(u string) (VFile, error)
 	//MkdirAll  will create all directories missing in the path
 	//If the directory already exists it will not throw error, however if the path resolves to a file instead
-	//it will throw  error
-	MkdirAll(u string) (VFile, error)
-	//Move Files
-	Move(src, dst string) error
+	//it should error
+	MkdirAll(u *url.URL) (VFile, error)
+	//MkdirAllRaw same as MkdirAll, however it accepts  url as string
+	MkdirAllRaw(u string) (VFile, error)
+	//Move will
+	Move(src, dst *url.URL) error
+	//MoveRaw same as Move except it accepts url as string
+	MoveRaw(src, dst string) error
 	//Open a file based on the url of the file
 	Open(u *url.URL) (VFile, error)
-	// OpenFile is same as Open function, however it accepts the url as string
-	OpenFile(u string) (VFile, error)
+	// OpenRaw is same as Open function, however it accepts the url as string
+	OpenRaw(u string) (VFile, error)
 	//Schemes is the list of schemes supported by this file system
 	Schemes() []string
+	//Walk will walk through each of the files in the directory recursively.
+	//If the URL resolves to a file it's not expected to throw an error instead the fn just be invoked with the VFile
+	//representing the url once
+	Walk(url *url.URL, fn WalkFn) error
+	//WalkRaw is same as Walk except that it will accept the url as a string
+	WalkRaw(raw string, fn WalkFn) error
+}
+
+type Manager interface {
+	VFileSystem
+	Register(vfs VFileSystem)
+	IsSupported(scheme string) bool
 }

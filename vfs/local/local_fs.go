@@ -1,60 +1,66 @@
 package local
 
 import (
-	"go.nandlabs.io/commons/vfs"
 	"net/url"
 	"os"
+
+	"go.nandlabs.io/commons/vfs"
 )
 
-var fileScheme = "file"
-var emptyScheme = ""
-var localFsSchemes []string = []string{"file", ""}
+const (
+	fileScheme  = "file"
+	emptyScheme = ""
+)
+
+var localFsSchemes []string = []string{fileScheme, emptyScheme}
 
 type OsFs struct {
 	*vfs.BaseVFS
 }
 
-func (l *OsFs) CopyAll(src, dst string) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (l *OsFs) Create(u string) (vfs.VFile, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (l *OsFs) Home() (vfs.VFile, error) {
-	panic("implement me")
-}
-func (l *OsFs) Open(u *url.URL) (file vfs.VFile, err error) {
-	if u.Scheme == "" {
-		u.Scheme = fileScheme
-	}
+func (o OsFs) Create(u *url.URL) (file vfs.VFile, err error) {
 	var f *os.File
-	f, err = os.Open(u.Path)
-	file = &OsFile{
-		file: f,
-		u:    u,
+	f, err = os.Create(u.Path)
+	if err == nil {
+		file = &OsFile{
+			file:     f,
+			Location: u,
+			fs:       o,
+		}
 	}
-
 	return
 }
 
-func (l *OsFs) Root() (vfs.VFile, error) {
-	panic("implement me")
+func (o OsFs) Mkdir(u *url.URL) (file vfs.VFile, err error) {
+
+	err = os.Mkdir(u.Path, os.ModePerm)
+	if err == nil {
+		file, err = o.Open(u)
+	}
+	return
 }
 
-func (l *OsFs) Mkdir(u string) (vfs.VFile, error) {
-	//TODO implement me
-	panic("implement me")
+func (o OsFs) MkdirAll(u *url.URL) (file vfs.VFile, err error) {
+	err = os.MkdirAll(u.Path, os.ModePerm)
+	if err == nil {
+		file, err = o.Open(u)
+	}
+	return
 }
 
-func (l *OsFs) MkdirAll(u string) (vfs.VFile, error) {
-	//TODO implement me
-	panic("implement me")
+func (o OsFs) Open(u *url.URL) (file vfs.VFile, err error) {
+	var f *os.File
+	f, err = os.Open(u.Path)
+	if err == nil {
+		file = &OsFile{
+			file:     f,
+			Location: u,
+			fs:       o,
+		}
+	}
+	return
 }
 
-func (l *OsFs) Schemes() []string {
+func (o OsFs) Schemes() []string {
 	return localFsSchemes
 }

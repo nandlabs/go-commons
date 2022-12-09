@@ -6,7 +6,7 @@ import (
 	"net/url"
 )
 
-type FileFilter func(u string) (bool, error)
+type FileFilter func(file VFile) (bool, error)
 
 //VFile interface provides the basic functions required to interact
 type VFile interface {
@@ -14,14 +14,11 @@ type VFile interface {
 	io.Closer
 	//VFileContent provider interface included
 	VFileContent
-	//Child of this instance identified by name
-	Child(name string) (VFile, error)
-	//Children of this file instance. can be nil in case of file object instead of directory
-	Children() ([]VFile, error)
-	//Copy files to the destination url. This can be in a different VFileSystem if the scheme is supported
-	Copy(destUrl string) error
-	//Move Files to the destination url.This can be in a different VFileSystem if the scheme is supported
-	Move(destUrl string) error
+
+	//List of this instance identified by name
+	List(name string) (VFile, error)
+	//ListAll children of this file instance. can be nil in case of file object instead of directory
+	ListAll() ([]VFile, error)
 	//Delete the file object. If the file type is directory all  files and subdirectories will be deleted
 	Delete() error
 	//DeleteMatching will delete only the files that match the filter.
@@ -32,14 +29,14 @@ type VFile interface {
 	Find(filter FileFilter) ([]VFile, error)
 	//Info  Get the file ifo
 	Info() (VFileInfo, error)
-	// IsRoot specifies if this is the root of the filesystem
-	IsRoot() (bool, error)
 	//Parent of the file system
 	Parent() (VFile, error)
 	//Url of the file
 	Url() *url.URL
 	// AddProperty will add a property to the file
 	AddProperty(name string, value string) error
+	// GetProperty will add a property to the file
+	GetProperty(name string) (string, error)
 }
 
 //VFileContent interface providers access to the content
@@ -51,10 +48,8 @@ type VFileContent interface {
 	AsBytes() ([]byte, error)
 	//WriteString method with write the string
 	WriteString(s string) (int, error)
-	//Encoding of the underlying content. If not set defaults to UTF-8 for text files
-	Encoding() string
-	//Type of the content stored. This should be the
-	Type() string
+	//ContentType of the underlying content. If not set defaults to UTF-8 for text files
+	ContentType() string
 }
 
 type VFileInfo interface {
