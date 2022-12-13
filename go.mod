@@ -1,6 +1,6 @@
 module go.nandlabs.io/commons
 
-go 1.16
+go 1.18
 
 require (
 	go.nandlabs.io/l3 v0.0.1
