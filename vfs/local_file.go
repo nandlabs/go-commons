@@ -1,4 +1,4 @@
-package local
+package vfs
 
 import (
 	"go.nandlabs.io/commons/errutils"
@@ -9,14 +9,13 @@ import (
 
 	"go.nandlabs.io/commons/fsutils"
 	"go.nandlabs.io/commons/textutils"
-	"go.nandlabs.io/commons/vfs"
 )
 
 type OsFile struct {
-	*vfs.BaseFile
+	*BaseFile
 	file     *os.File
 	Location *url.URL
-	fs       vfs.VFileSystem
+	fs       VFileSystem
 }
 
 func (o *OsFile) Close() error {
@@ -39,11 +38,11 @@ func (o *OsFile) ContentType() string {
 	return fsutils.LookupContentType(o.Location.Path)
 }
 
-func (o *OsFile) List(name string) (file vfs.VFile, err error) {
+func (o *OsFile) List(name string) (file VFile, err error) {
 
-	var children []vfs.VFile
+	var children []VFile
 	children, err = o.ListAll()
-	var fi vfs.VFileInfo
+	var fi VFileInfo
 	if err == nil {
 		for _, c := range children {
 			if fi, err = c.Info(); err != nil {
@@ -60,13 +59,13 @@ func (o *OsFile) List(name string) (file vfs.VFile, err error) {
 
 }
 
-func (o *OsFile) ListAll() (files []vfs.VFile, err error) {
+func (o *OsFile) ListAll() (files []VFile, err error) {
 	var fis []fs.FileInfo
-	manager := vfs.GetManager()
+	manager := GetManager()
 	fis, err = ioutil.ReadDir(o.Location.Path)
 	if err == nil {
-		var children []vfs.VFile
-		var child vfs.VFile
+		var children []VFile
+		var child VFile
 		var childUrl *url.URL
 		for _, fi := range fis {
 			childUrl, err = o.Location.Parse(textutils.ForwardSlashStr + fi.Name())
@@ -93,8 +92,8 @@ func (o *OsFile) Delete() error {
 	return os.Remove(o.Location.Path)
 }
 
-func (o *OsFile) Find(filter vfs.FileFilter) (files []vfs.VFile, err error) {
-	err = o.fs.Walk(o.Location, func(file vfs.VFile) (err error) {
+func (o *OsFile) Find(filter FileFilter) (files []VFile, err error) {
+	err = o.fs.Walk(o.Location, func(file VFile) (err error) {
 		var filterPass bool
 		filterPass, err = filter(file)
 		if err == nil && filterPass {
@@ -105,11 +104,11 @@ func (o *OsFile) Find(filter vfs.FileFilter) (files []vfs.VFile, err error) {
 	return
 }
 
-func (o *OsFile) Info() (vfs.VFileInfo, error) {
+func (o *OsFile) Info() (VFileInfo, error) {
 	return o.file.Stat()
 }
 
-func (o *OsFile) Parent() (file vfs.VFile, err error) {
+func (o *OsFile) Parent() (file VFile, err error) {
 	var fileInfos []fs.FileInfo
 	fileInfos, err = ioutil.ReadDir(o.Location.Path)
 	if err == nil {

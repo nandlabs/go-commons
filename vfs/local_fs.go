@@ -1,10 +1,8 @@
-package local
+package vfs
 
 import (
 	"net/url"
 	"os"
-
-	"go.nandlabs.io/commons/vfs"
 )
 
 const (
@@ -15,10 +13,10 @@ const (
 var localFsSchemes []string = []string{fileScheme, emptyScheme}
 
 type OsFs struct {
-	*vfs.BaseVFS
+	*BaseVFS
 }
 
-func (o OsFs) Create(u *url.URL) (file vfs.VFile, err error) {
+func (o OsFs) Create(u *url.URL) (file VFile, err error) {
 	var f *os.File
 	f, err = os.Create(u.Path)
 	if err == nil {
@@ -31,7 +29,7 @@ func (o OsFs) Create(u *url.URL) (file vfs.VFile, err error) {
 	return
 }
 
-func (o OsFs) Mkdir(u *url.URL) (file vfs.VFile, err error) {
+func (o OsFs) Mkdir(u *url.URL) (file VFile, err error) {
 
 	err = os.Mkdir(u.Path, os.ModePerm)
 	if err == nil {
@@ -40,7 +38,7 @@ func (o OsFs) Mkdir(u *url.URL) (file vfs.VFile, err error) {
 	return
 }
 
-func (o OsFs) MkdirAll(u *url.URL) (file vfs.VFile, err error) {
+func (o OsFs) MkdirAll(u *url.URL) (file VFile, err error) {
 	err = os.MkdirAll(u.Path, os.ModePerm)
 	if err == nil {
 		file, err = o.Open(u)
@@ -48,7 +46,7 @@ func (o OsFs) MkdirAll(u *url.URL) (file vfs.VFile, err error) {
 	return
 }
 
-func (o OsFs) Open(u *url.URL) (file vfs.VFile, err error) {
+func (o OsFs) Open(u *url.URL) (file VFile, err error) {
 	var f *os.File
 	f, err = os.Open(u.Path)
 	if err == nil {
