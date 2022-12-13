@@ -38,27 +38,6 @@ func (o *OsFile) ContentType() string {
 	return fsutils.LookupContentType(o.Location.Path)
 }
 
-func (o *OsFile) List(name string) (file VFile, err error) {
-
-	var children []VFile
-	children, err = o.ListAll()
-	var fi VFileInfo
-	if err == nil {
-		for _, c := range children {
-			if fi, err = c.Info(); err != nil {
-				if fi.Name() == name {
-					file = c
-					break
-				}
-			} else {
-				break
-			}
-		}
-	}
-	return
-
-}
-
 func (o *OsFile) ListAll() (files []VFile, err error) {
 	var fis []fs.FileInfo
 	manager := GetManager()

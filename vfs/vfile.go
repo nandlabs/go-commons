@@ -14,9 +14,6 @@ type VFile interface {
 	io.Closer
 	//VFileContent provider interface included
 	VFileContent
-
-	//List of this instance identified by name
-	List(name string) (VFile, error)
 	//ListAll children of this file instance. can be nil in case of file object instead of directory
 	ListAll() ([]VFile, error)
 	//Delete the file object. If the file type is directory all  files and subdirectories will be deleted

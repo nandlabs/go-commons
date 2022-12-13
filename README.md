@@ -9,7 +9,7 @@ Go Commons is a collection of reusable common utilities
 
 ### Installation
 
-```bash
+```
 go get go.nandlabs.io/commons
 ```
 
