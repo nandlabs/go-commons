@@ -17,7 +17,8 @@ go get go.nandlabs.io/commons
 * [Multi Format Codec Support](codec/README.md)
 * [Configuration Support](config/README.md)
 * [Lightweight Levelled Logger (l3)](l3/README.md)
-* [Http Routing Capabilities  (turbo](turbo/README.md)
+* [Http Routing Capabilities  (turbo)](turbo/README.md)
+* [Virtual File System (vfs)](vfs/README.md)
 
 
 ## WIP
