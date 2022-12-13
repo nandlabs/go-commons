@@ -2,7 +2,6 @@ package vfs
 
 import (
 	"go.nandlabs.io/commons/errutils"
-	"go.nandlabs.io/commons/vfs/local"
 	"net/url"
 	"sync"
 )
@@ -240,7 +239,7 @@ func (fs *fileSystems) WalkRaw(raw string, fn WalkFn) (err error) {
 func init() {
 
 	manager = &fileSystems{}
-	localFs := &local.OsFs{}
+	localFs := &OsFs{}
 	manager.Register(localFs)
 }
 
