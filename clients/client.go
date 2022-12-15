@@ -42,7 +42,7 @@ func (m *Manager) Get(id string) Client {
 	return m.clients[id]
 }
 
-func (m *Manager) Register(id string, c Client, retryInfo *RetryInfo, breakerInfo *CircuitBreakerInfo) {
+func (m *Manager) Register(id string, c Client, retryInfo *RetryInfo, breakerInfo *BreakerInfo) {
 	ci := &clientInfo{
 		circuitBreaker: NewCB(breakerInfo),
 		retryHandler:   retryInfo,

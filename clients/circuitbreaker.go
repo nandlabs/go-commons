@@ -18,7 +18,7 @@ const (
 
 var CBOpenErr = errors.New("the Circuit breaker is open and unable to process request")
 
-type CircuitBreakerInfo struct {
+type BreakerInfo struct {
 	CurrentState     uint32
 	SuccessThreshold uint64
 	FailureThreshold uint64
@@ -28,16 +28,16 @@ type CircuitBreakerInfo struct {
 
 // CircuitBreaker struct
 type CircuitBreaker struct {
-	*CircuitBreakerInfo
+	*BreakerInfo
 	successCounter  uint64
 	failureCounter  uint64
 	halfOpenCounter uint32
 }
 
-func NewCB(info *CircuitBreakerInfo) (cb *CircuitBreaker) {
+func NewCB(info *BreakerInfo) (cb *CircuitBreaker) {
 
 	if info == nil {
-		info = &CircuitBreakerInfo{}
+		info = &BreakerInfo{}
 	}
 
 	//Init the circuit as closed
@@ -58,10 +58,10 @@ func NewCB(info *CircuitBreakerInfo) (cb *CircuitBreaker) {
 	}
 
 	return &CircuitBreaker{
-		CircuitBreakerInfo: info,
-		successCounter:     0,
-		failureCounter:     0,
-		halfOpenCounter:    0,
+		BreakerInfo:     info,
+		successCounter:  0,
+		failureCounter:  0,
+		halfOpenCounter: 0,
 	}
 
 }
