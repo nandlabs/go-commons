@@ -19,9 +19,8 @@ const (
 var CBOpenErr = errors.New("the Circuit breaker is open and unable to process request")
 
 type BreakerInfo struct {
-	CurrentState     uint32
-	SuccessThreshold uint64
 	FailureThreshold uint64
+	SuccessThreshold uint64
 	MaxHalfOpen      uint32
 	Timeout          uint32
 }
@@ -29,6 +28,7 @@ type BreakerInfo struct {
 // CircuitBreaker struct
 type CircuitBreaker struct {
 	*BreakerInfo
+	currentState    uint32
 	successCounter  uint64
 	failureCounter  uint64
 	halfOpenCounter uint32
@@ -39,9 +39,6 @@ func NewCB(info *BreakerInfo) (cb *CircuitBreaker) {
 	if info == nil {
 		info = &BreakerInfo{}
 	}
-
-	//Init the circuit as closed
-	info.CurrentState = circuitClosed
 
 	if info.SuccessThreshold == 0 {
 		info.SuccessThreshold = defaultSuccessThreshold
@@ -62,6 +59,7 @@ func NewCB(info *BreakerInfo) (cb *CircuitBreaker) {
 		successCounter:  0,
 		failureCounter:  0,
 		halfOpenCounter: 0,
+		currentState:    circuitClosed,
 	}
 
 }
@@ -102,7 +100,7 @@ func (cb *CircuitBreaker) OnExecution(success bool) {
 }
 
 func (cb *CircuitBreaker) Reset() {
-	atomic.StoreUint32(&cb.CurrentState, circuitClosed)
+	atomic.StoreUint32(&cb.currentState, circuitClosed)
 	atomic.StoreUint64(&cb.failureCounter, 0)
 	atomic.StoreUint64(&cb.successCounter, 0)
 	atomic.StoreUint32(&cb.halfOpenCounter, 0)
@@ -111,7 +109,7 @@ func (cb *CircuitBreaker) Reset() {
 
 func (cb *CircuitBreaker) updateState(oldState, newState uint32) {
 
-	if atomic.CompareAndSwapUint32(&cb.CurrentState, oldState, newState) {
+	if atomic.CompareAndSwapUint32(&cb.currentState, oldState, newState) {
 		atomic.StoreUint64(&cb.successCounter, 0)
 		atomic.StoreUint64(&cb.failureCounter, 0)
 		atomic.StoreUint32(&cb.halfOpenCounter, 0)
