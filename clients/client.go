@@ -1,6 +1,9 @@
 package clients
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type Client interface {
 	Execute(req any) (res any, err error)
@@ -34,19 +37,28 @@ func (c *clientInfo) Execute(req any) (res any, err error) {
 	return
 }
 
-type Manager struct {
+type ClientManager struct {
+	sync.RWMutex
 	clients map[string]*clientInfo
 }
 
-func (m *Manager) Get(id string) Client {
-	return m.clients[id]
+var Manager = &ClientManager{
+	clients: make(map[string]*clientInfo),
 }
 
-func (m *Manager) Register(id string, c Client, retryInfo *RetryInfo, breakerInfo *BreakerInfo) {
+func (cm *ClientManager) GetClient(id string) Client {
+	cm.RLock()
+	defer cm.RUnlock()
+	return cm.clients[id]
+}
+
+func (cm *ClientManager) Register(id string, c Client, retryInfo *RetryInfo, breakerInfo *BreakerInfo) {
+	cm.Lock()
+	defer cm.Unlock()
 	ci := &clientInfo{
 		circuitBreaker: NewCB(breakerInfo),
 		retryHandler:   retryInfo,
 		client:         c,
 	}
-	m.clients[id] = ci
+	cm.clients[id] = ci
 }
