@@ -23,7 +23,7 @@ func (c *clientInfo) Execute(req any) (res any, err error) {
 		res, err = c.client.Execute(req)
 		if err != nil {
 			for i := 0; i < c.retryHandler.MaxRetries; i++ {
-				time.Sleep(time.Second * time.Duration(c.retryHandler.RetryGap))
+				time.Sleep(time.Second * time.Duration(c.retryHandler.Wait))
 				res, err = c.client.Execute(req)
 				if err == nil {
 					break
