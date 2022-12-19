@@ -19,9 +19,10 @@ const (
 	ValidateBefWrite        = "ValidateBefWrite"
 )
 
-var DefaultCodecOptions map[string]interface{}
+var DefaultCodecOptions = make(map[string]interface{})
 
 func init() {
+
 	DefaultCodecOptions[ValidateOnRead] = defaultValidateOnRead
 	DefaultCodecOptions[ValidateBefWrite] = defaultValidateBefWrite
 }
