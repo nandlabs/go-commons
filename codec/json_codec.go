@@ -2,11 +2,8 @@ package codec
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"go.nandlabs.io/commons/codec/validator"
 	"io"
-	"io/ioutil"
 )
 
 var structValidator = validator.NewStructValidator()
@@ -26,35 +23,34 @@ func JsonRW(options map[string]interface{}) *JsonCodec {
 	return &JsonCodec{options: options}
 }
 
-func (c *JsonCodec) Write(v interface{}, w io.Writer) error {
+func (c *JsonCodec) Write(v interface{}, w io.Writer) (err error) {
 	// marshal wrapper
 	// if the validation is successful then use the core json marshal to generate the json-codec from the struct and write it back to the buffer
-	if err := structValidator.Validate(v); err != nil {
-		return err
+	if c.options != nil {
+		if v, ok := c.options[ValidateBefWrite]; ok && v.(bool) {
+			err = structValidator.Validate(v)
+		}
 	}
-	output, err := json.Marshal(v)
-	if err != nil {
-		// in case of error during marshaling
-		return errors.New(fmt.Sprintf("json marshal error: %d", err))
+
+	if err == nil {
+		err = json.NewEncoder(w).Encode(v)
 	}
-	_, errW := w.Write(output)
-	if errW != nil {
-		return errW
-	}
-	return nil
+	return
+
 }
 
-func (c *JsonCodec) Read(r io.Reader, v interface{}) error {
+func (c *JsonCodec) Read(r io.Reader, v interface{}) (err error) {
 	// unmarshal wrapper
 	// read the data from reader and map it to the interface
-	b, err := ioutil.ReadAll(r)
-	if err != nil {
-		return errors.New(fmt.Sprintf("json input error: %d", err))
+	if c.options != nil {
+		if v, ok := c.options[ValidateOnRead]; ok && v.(bool) {
+			err = structValidator.Validate(v)
+		}
 	}
-	if errU := json.Unmarshal(b, v); err != nil {
-		return errors.New(fmt.Sprintf("json unmarshal error: %d", errU))
+	if err == nil {
+		err = json.NewDecoder(r).Decode(v)
 	}
-	return nil
+	return
 }
 
 // Commenting for now, to be used later for the info during caching, if required!!
