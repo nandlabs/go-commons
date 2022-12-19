@@ -26,17 +26,31 @@ func JsonRW(options map[string]interface{}) *JsonCodec {
 func (c *JsonCodec) Write(v interface{}, w io.Writer) (err error) {
 	// marshal wrapper
 	// if the validation is successful then use the core json marshal to generate the json-codec from the struct and write it back to the buffer
-	if err = structValidator.Validate(v); err == nil {
+	if c.options != nil {
+		if v, ok := c.options[ValidateBefWrite]; ok && v.(bool) {
+			err = structValidator.Validate(v)
+		}
+	}
+
+	if err == nil {
 		err = json.NewEncoder(w).Encode(v)
 	}
 	return
 
 }
 
-func (c *JsonCodec) Read(r io.Reader, v interface{}) error {
+func (c *JsonCodec) Read(r io.Reader, v interface{}) (err error) {
 	// unmarshal wrapper
 	// read the data from reader and map it to the interface
-	return json.NewDecoder(r).Decode(v)
+	if c.options != nil {
+		if v, ok := c.options[ValidateOnRead]; ok && v.(bool) {
+			err = structValidator.Validate(v)
+		}
+	}
+	if err == nil {
+		err = json.NewDecoder(r).Decode(v)
+	}
+	return
 }
 
 // Commenting for now, to be used later for the info during caching, if required!!

@@ -10,12 +10,21 @@ import (
 )
 
 const (
-	JSON = "application/json"
-	XML  = "text/xml"
-	YAML = "text/yaml"
+	JSON                    = "application/json"
+	XML                     = "text/xml"
+	YAML                    = "text/yaml"
+	defaultValidateOnRead   = false
+	defaultValidateBefWrite = false
+	ValidateOnRead          = "ValidateOnRead"
+	ValidateBefWrite        = "ValidateBefWrite"
 )
 
 var DefaultCodecOptions map[string]interface{}
+
+func init() {
+	DefaultCodecOptions[ValidateOnRead] = defaultValidateOnRead
+	DefaultCodecOptions[ValidateBefWrite] = defaultValidateBefWrite
+}
 
 // StringEncoder Interface
 type StringEncoder interface {
