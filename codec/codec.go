@@ -2,6 +2,7 @@ package codec
 
 import (
 	"bytes"
+	"go.nandlabs.io/commons/errutils"
 	"io"
 	"strings"
 
@@ -13,6 +14,8 @@ const (
 	XML  = "text/xml"
 	YAML = "text/yaml"
 )
+
+var DefaultCodecOptions map[string]interface{}
 
 // StringEncoder Interface
 type StringEncoder interface {
@@ -73,27 +76,31 @@ type BaseCodec struct {
 }
 
 //TODO Add error
-func Get(contentType string, options map[string]interface{}) Codec {
-	var readerWriter ReaderWriter
+func Get(contentType string, options map[string]interface{}) (c Codec, err error) {
 	switch contentType {
 	case JSON:
 		{
-			readerWriter = JsonRW(options)
+			c = BaseCodec{
+				readerWriter: JsonRW(options),
+			}
 		}
 	case XML:
 		{
-			readerWriter = XmlRW(options)
+			c = BaseCodec{
+				readerWriter: XmlRW(options),
+			}
 		}
 	case YAML:
 		{
-			readerWriter = YamlRW(options)
+			c = BaseCodec{
+				readerWriter: YamlRW(options),
+			}
 		}
+	default:
+		err = errutils.FmtError("Unsupported contentType %s", contentType)
 	}
 
-	return BaseCodec{
-		readerWriter: readerWriter,
-	}
-
+	return
 }
 
 func (bc BaseCodec) DecodeString(s string, v interface{}) error {
