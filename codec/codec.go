@@ -2,10 +2,10 @@ package codec
 
 import (
 	"bytes"
-	"go.nandlabs.io/commons/errutils"
 	"io"
 	"strings"
 
+	"go.nandlabs.io/commons/errutils"
 	"go.nandlabs.io/commons/textutils"
 )
 
