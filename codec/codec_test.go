@@ -26,13 +26,13 @@ type Message2 struct {
 
 func TestNewJsonCodec(t *testing.T) {
 	m := Message2{"TestUser", "Hello", 123124124}
-	c := Get("application/json", nil)
+	c, _ := Get("application/json", nil)
 	buf := new(bytes.Buffer)
 	if err := c.Write(m, buf); err != nil {
 		t.Errorf("error in write: %d", err)
 	}
 
-	const want = `{"name":"TestUser","body":"Hello","time":123124124}`
+	const want = "{\"name\":\"TestUser\",\"body\":\"Hello\",\"time\":123124124}\n"
 	if got := buf; got.String() != want {
 		t.Errorf("got %q, want %q", got.String(), want)
 	}
@@ -40,7 +40,7 @@ func TestNewJsonCodec(t *testing.T) {
 
 func TestNewJsonCodec2(t *testing.T) {
 	var m Message
-	c := Get("application/json", nil)
+	c, _ := Get("application/json", nil)
 	const input = `{"name":"Test","body":"Hello","time":123124124}`
 	b := strings.NewReader(input)
 	if err := c.Read(b, &m); err != nil {
@@ -58,7 +58,7 @@ func TestNewJsonCodec2(t *testing.T) {
 
 func TestNewXmlCodec(t *testing.T) {
 	m := XMLMessage{"Test", "Hello", 123124124}
-	c := Get("text/xml", nil)
+	c, _ := Get("text/xml", nil)
 	buf := new(bytes.Buffer)
 	if err := c.Write(m, buf); err != nil {
 		t.Errorf("error in write: %d", err)
@@ -72,7 +72,7 @@ func TestNewXmlCodec(t *testing.T) {
 
 func TestNewXmlCodec2(t *testing.T) {
 	var m XMLMessage
-	c := Get("text/xml", nil)
+	c, _ := Get("text/xml", nil)
 	const input = `<XMLMessage><name>Test</name><body>Hello</body><time>123124124</time></XMLMessage>`
 	b := strings.NewReader(input)
 	if err := c.Read(b, &m); err != nil {
@@ -85,5 +85,14 @@ func TestNewXmlCodec2(t *testing.T) {
 	}
 	if m != want {
 		t.Errorf("got %q, want %q", m, want)
+	}
+}
+
+func TestNewInvalid(t *testing.T) {
+	_, err := Get("text/plain", nil)
+
+	if err == nil {
+		t.Error("got nil wanted err")
+
 	}
 }
