@@ -32,6 +32,7 @@ type Client struct {
 	httpClient     http.Client
 	httpTransport  *http.Transport
 	tlsConfig      *tls.Config
+	codecOptions   map[string]interface{}
 }
 
 // NewClient function generates a new client with default values
@@ -57,6 +58,16 @@ func NewClient() *Client {
 // The default value is 60 seconds
 func (c *Client) ReqTimeout(t uint) *Client {
 	c.httpClient.Timeout = time.Duration(t) * time.Second
+	return c
+}
+
+// AddCodecOption sets the option for codec to be used
+func (c *Client) AddCodecOption(k string, v interface{}) *Client {
+	if c.codecOptions == nil {
+		c.codecOptions = make(map[string]interface{})
+	}
+	c.codecOptions[k] = v
+
 	return c
 }
 
@@ -147,6 +158,7 @@ func (c *Client) NewRequest(url, method string) *Request {
 		url:    url,
 		method: method,
 		header: map[string][]string{},
+		client: c,
 	}
 }
 
@@ -178,7 +190,7 @@ func (c *Client) Execute(req *Request) (res *Response, err error) {
 			httpRes, err = c.httpClient.Do(httpReq)
 		}
 		if err == nil {
-			res = &Response{raw: httpRes}
+			res = &Response{raw: httpRes, client: c}
 		}
 	}
 	return
