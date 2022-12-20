@@ -9,19 +9,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type YamlCodec struct {
-	options map[string]interface{}
+type yamlRW struct {
 }
 
-func NewYamlCodec(options map[string]interface{}) Codec {
-	return BaseCodec{readerWriter: YamlRW(options)}
-}
-
-func YamlRW(options map[string]interface{}) *YamlCodec {
-	return &YamlCodec{options: options}
-}
-
-func (y *YamlCodec) Write(v interface{}, w io.Writer) error {
+func (y *yamlRW) Write(v interface{}, w io.Writer) error {
 	output, err := yaml.Marshal(v)
 	if err != nil {
 		return errors.New(fmt.Sprintf("xml marshal error: %d", err))
@@ -33,7 +24,7 @@ func (y *YamlCodec) Write(v interface{}, w io.Writer) error {
 	return nil
 }
 
-func (y *YamlCodec) Read(r io.Reader, v interface{}) error {
+func (y *yamlRW) Read(r io.Reader, v interface{}) error {
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		return errors.New(fmt.Sprintf("xml input error: %d", err))

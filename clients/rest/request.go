@@ -30,6 +30,7 @@ type Request struct {
 	body        any
 	bodyReader  io.Reader
 	contentType string
+	client      *Client
 }
 
 //Method function prints the current method for this Request
@@ -143,7 +144,7 @@ func (r *Request) toHttpRequest() (httpReq *http.Request, err error) {
 				go func() {
 					defer ioutils.CloserFunc(pw)
 					var c codec.Codec
-					c, err = codec.Get(r.contentType, nil)
+					c, err = codec.Get(r.contentType, r.client.codecOptions)
 					if err == nil {
 						err = c.Write(r.body, pw)
 					}

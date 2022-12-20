@@ -19,14 +19,28 @@ type XMLMessage struct {
 }
 
 type Message2 struct {
-	Name string `json:"name" constraints:"required=true;nillable=true;min-length=5"`
-	Body string `json:"body" constraints:"required=true;nillable=true;max-length=50"`
-	Time int64  `json:"time" constraints:"required=true;nillable=true;min=10"`
+	Name string `json:"name" constraints:"min-length=5"`
+	Body string `json:"body" constraints:"max-length=50"`
+	Time int64  `json:"time" constraints:"min=10"`
 }
 
-func TestNewJsonCodec(t *testing.T) {
+func TestNewJson(t *testing.T) {
 	m := Message2{"TestUser", "Hello", 123124124}
 	c, _ := Get("application/json", nil)
+	buf := new(bytes.Buffer)
+	if err := c.Write(m, buf); err != nil {
+		t.Errorf("error in write: %d", err)
+	}
+
+	const want = "{\"name\":\"TestUser\",\"body\":\"Hello\",\"time\":123124124}\n"
+	if got := buf; got.String() != want {
+		t.Errorf("got %q, want %q", got.String(), want)
+	}
+}
+
+func TestNewDefaultJson(t *testing.T) {
+	m := Message2{"TestUser", "Hello", 123124124}
+	c, _ := GetDefault("application/json")
 	buf := new(bytes.Buffer)
 	if err := c.Write(m, buf); err != nil {
 		t.Errorf("error in write: %d", err)
