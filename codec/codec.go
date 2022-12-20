@@ -22,7 +22,6 @@ const (
 var DefaultCodecOptions = make(map[string]interface{})
 
 func init() {
-
 	DefaultCodecOptions[ValidateOnRead] = defaultValidateOnRead
 	DefaultCodecOptions[ValidateBefWrite] = defaultValidateBefWrite
 }
@@ -85,7 +84,7 @@ type BaseCodec struct {
 	readerWriter ReaderWriter
 }
 
-//TODO Add error
+// TODO Add error
 func Get(contentType string, options map[string]interface{}) (c Codec, err error) {
 	switch contentType {
 	case JSON:
