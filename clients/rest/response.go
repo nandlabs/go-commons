@@ -9,7 +9,8 @@ import (
 )
 
 type Response struct {
-	raw *http.Response
+	raw    *http.Response
+	client *Client
 }
 
 //IsSuccess determines if the response is a success response
@@ -33,7 +34,7 @@ func (r Response) Decode(v interface{}) (err error) {
 	if r.IsSuccess() {
 		defer ioutils.CloserFunc(r.raw.Body)
 		contentType := r.raw.Header.Get(contentTypeHdr)
-		c, err = codec.Get(contentType, codec.DefaultCodecOptions)
+		c, err = codec.Get(contentType, r.client.codecOptions)
 		if err == nil {
 			err = c.Read(r.raw.Body, v)
 		}
