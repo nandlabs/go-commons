@@ -21,7 +21,7 @@ func BenchmarkJsonCodec(b *testing.B) {
 		Cost:        299.9,
 		ItemCount:   2000,
 	}
-	c := Get("application/json", nil)
+	c, _ := Get("application/json", nil)
 	buf := new(bytes.Buffer)
 
 	for i := 0; i < b.N; i++ {
