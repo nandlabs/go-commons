@@ -11,12 +11,7 @@ import (
 
 var logger = l3.Get()
 
-var mapMandatory = map[string]string{
-	"required": "required",
-	"nillable": "nillable",
-}
-
-type StructValidatorFunc func(v reflect.Value, typ reflect.Type, param string) error
+type StructValidatorFunc func(field field, param string) error
 
 type tStruct struct {
 	name  string
@@ -41,19 +36,13 @@ type StructValidator struct {
 	fields         structFields
 	validationFunc map[string]StructValidatorFunc
 	tagName        string
+	enableCache    bool
 }
 
 func NewStructValidator() *StructValidator {
 	return &StructValidator{
 		validationFunc: map[string]StructValidatorFunc{
 			// Base Constraints
-			// boolean value
-			// mandatory field
-			"required": required,
-			// boolean value
-			// mandatory field
-			"nillable": nillable,
-			"default":  def,
 			// Numeric Constraints
 			// <, > only
 			"min": min,
@@ -63,6 +52,8 @@ func NewStructValidator() *StructValidator {
 			"exclusiveMax": exclusiveMax,
 			"multipleOf":   multipleOf,
 			// String Constraints
+			// boolean value
+			"notnull":    notnull,
 			"min-length": minLength,
 			"max-length": maxLength,
 			// regex pattern support
@@ -70,14 +61,18 @@ func NewStructValidator() *StructValidator {
 			// enums support
 			"enum": enum,
 		},
-		tagName: "constraints",
+		tagName:     "constraints",
+		enableCache: false,
 	}
 }
 
-func (sv *StructValidator) Validate(v interface{}) error {
-	//logger.Info("starting struct validation")
-	// add a logic to check for the empty struct input in order to skip the validation of the struct
+func NewStructValidatorWithCache() *StructValidator {
+	withCache := NewStructValidator()
+	withCache.enableCache = true
+	return withCache
+}
 
+func (sv *StructValidator) Validate(v interface{}) error {
 	//check for cache
 	sv.fields = sv.cachedTypeFields(v)
 	if err := sv.validateFields(); err != nil {
@@ -87,12 +82,14 @@ func (sv *StructValidator) Validate(v interface{}) error {
 }
 
 func (sv *StructValidator) validateFields() error {
-	for _, v := range sv.fields.list {
-		if err := checkForMandatory(v.constraints); err != nil {
-			return err
+	for _, field := range sv.fields.list {
+		// check if the constraints tag is present or not, skip any kind of validation for which the constraints are not passed
+		if (reflect.DeepEqual(field.constraints[0], tStruct{})) {
+			logger.InfoF("skipping validation check for field: %s", field.name)
+			continue
 		}
-		for _, val := range v.constraints {
-			if err := val.fnc(v.value, v.typ, val.value); err != nil {
+		for _, val := range field.constraints {
+			if err := val.fnc(field, val.value); err != nil {
 				return err
 			}
 		}
@@ -100,20 +97,7 @@ func (sv *StructValidator) validateFields() error {
 	return nil
 }
 
-func checkForMandatory(constraint []tStruct) error {
-	count := 0
-	for _, t := range constraint {
-		if _, ok := mapMandatory[t.name]; ok {
-			count++
-		}
-	}
-	if count != len(mapMandatory) {
-		return ErrMandatoryFields
-	}
-	return nil
-}
-
-//parseTag returns the map of constraints
+// parseTag returns the map of constraints
 func (sv *StructValidator) parseTag(tag string) ([]tStruct, error) {
 	tl := splitUnescapedComma(tag)
 	t := make([]tStruct, 0, len(tl))
@@ -232,10 +216,14 @@ func (sv *StructValidator) parseFields(v interface{}) structFields {
 var fieldCache sync.Map //map[reflect.Type]structFields
 
 func (sv *StructValidator) cachedTypeFields(v interface{}) structFields {
-	t := reflect.ValueOf(v).Type()
-	if f, ok := fieldCache.Load(t); ok {
+	if sv.enableCache {
+		t := reflect.ValueOf(v).Type()
+		if f, ok := fieldCache.Load(t); ok {
+			return f.(structFields)
+		}
+		f, _ := fieldCache.LoadOrStore(t, sv.parseFields(v))
 		return f.(structFields)
 	}
-	f, _ := fieldCache.LoadOrStore(t, sv.parseFields(v))
-	return f.(structFields)
+	f := sv.parseFields(v)
+	return f
 }
