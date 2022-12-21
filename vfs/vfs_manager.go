@@ -1,9 +1,10 @@
 package vfs
 
 import (
-	"go.nandlabs.io/commons/errutils"
 	"net/url"
 	"sync"
+
+	"go.nandlabs.io/commons/errutils"
 )
 
 var manager Manager
