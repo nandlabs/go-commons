@@ -1,9 +1,10 @@
 package vfs
 
 import (
-	"go.nandlabs.io/commons/ioutils"
 	"io"
 	"net/url"
+
+	"go.nandlabs.io/commons/ioutils"
 )
 
 type BaseVFS struct {

@@ -1,8 +1,9 @@
 package codec
 
 import (
-	"gopkg.in/yaml.v3"
 	"io"
+
+	"gopkg.in/yaml.v3"
 )
 
 type yamlRW struct {

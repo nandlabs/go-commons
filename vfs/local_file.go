@@ -1,12 +1,12 @@
 package vfs
 
 import (
-	"go.nandlabs.io/commons/errutils"
 	"io/fs"
 	"io/ioutil"
 	"net/url"
 	"os"
 
+	"go.nandlabs.io/commons/errutils"
 	"go.nandlabs.io/commons/fsutils"
 	"go.nandlabs.io/commons/textutils"
 )
