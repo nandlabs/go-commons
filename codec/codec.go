@@ -18,6 +18,9 @@ const (
 	defaultValidateBefWrite = false
 	ValidateOnRead          = "ValidateOnRead"
 	ValidateBefWrite        = "ValidateBefWrite"
+	Charset                 = "charset"
+	JsonEscapeHTML          = "JsonEscapeHTML"
+	PrettyPrint             = "PrettyPrint"
 )
 
 // StringEncoder Interface
@@ -112,19 +115,39 @@ func Get(contentType string, options map[string]interface{}) (c Codec, err error
 	bc := &BaseCodec{
 		options: options,
 	}
-	switch contentType {
+	typ := contentType
+	if strings.Contains(contentType, textutils.SemiColonStr) {
+		values := strings.Split(contentType, textutils.SemiColonStr)
+		l := len(values)
+		for i := 0; i < l; i++ {
+			val := strings.TrimSpace(values[i])
+			if i == 0 {
+				typ = val
+			} else {
+				if strings.HasPrefix(val, Charset) {
+					charset := strings.Split(val, textutils.EqualStr)
+					if len(charset) == 2 {
+						//Charset is added to the options but not used by the known json,xml and yaml Read Writers
+						bc.SetOption(Charset, strings.TrimSpace(charset[1]))
+					}
+				}
+			}
+		}
+	}
+
+	switch typ {
 	case JSON:
 		{
-			bc.readerWriter = &jsonRW{}
+			bc.readerWriter = &jsonRW{options: options}
 
 		}
 	case XML:
 		{
-			bc.readerWriter = &xmlRW{}
+			bc.readerWriter = &xmlRW{options: options}
 		}
 	case YAML:
 		{
-			bc.readerWriter = &yamlRW{}
+			bc.readerWriter = &yamlRW{options: options}
 		}
 	default:
 		err = errutils.FmtError("Unsupported contentType %s", contentType)

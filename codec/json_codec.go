@@ -2,18 +2,29 @@ package codec
 
 import (
 	"encoding/json"
-	"go.nandlabs.io/commons/codec/validator"
 	"io"
+
+	"go.nandlabs.io/commons/codec/validator"
 )
 
 var structValidator = validator.NewStructValidator()
 
 type jsonRW struct {
+	options map[string]interface{}
 }
 
 func (c *jsonRW) Write(v interface{}, w io.Writer) error {
+	//only utf-8 charset is supported
+	var escapeHtml = false
+	if c.options != nil {
+		if v, ok := c.options[JsonEscapeHTML]; ok {
+			escapeHtml = v.(bool)
+		}
 
-	return json.NewEncoder(w).Encode(v)
+	}
+	encoder := json.NewEncoder(w)
+	encoder.SetEscapeHTML(escapeHtml)
+	return encoder.Encode(v)
 
 }
 
