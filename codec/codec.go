@@ -11,16 +11,17 @@ import (
 )
 
 const (
-	JSON                    = "application/json"
-	XML                     = "text/xml"
-	YAML                    = "text/yaml"
-	defaultValidateOnRead   = false
-	defaultValidateBefWrite = false
-	ValidateOnRead          = "ValidateOnRead"
-	ValidateBefWrite        = "ValidateBefWrite"
-	Charset                 = "charset"
-	JsonEscapeHTML          = "JsonEscapeHTML"
-	PrettyPrint             = "PrettyPrint"
+	JSON                      = "application/json"
+	XML                       = "text/xml"
+	XmlApplicationContentType = "application/xml"
+	YAML                      = "text/yaml"
+	defaultValidateOnRead     = false
+	defaultValidateBefWrite   = false
+	ValidateOnRead            = "ValidateOnRead"
+	ValidateBefWrite          = "ValidateBefWrite"
+	Charset                   = "charset"
+	JsonEscapeHTML            = "JsonEscapeHTML"
+	PrettyPrint               = "PrettyPrint"
 )
 
 // StringEncoder Interface
@@ -141,7 +142,7 @@ func Get(contentType string, options map[string]interface{}) (c Codec, err error
 			bc.readerWriter = &jsonRW{options: options}
 
 		}
-	case XML:
+	case XML, XmlApplicationContentType:
 		{
 			bc.readerWriter = &xmlRW{options: options}
 		}
