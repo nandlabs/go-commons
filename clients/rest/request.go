@@ -1,11 +1,16 @@
 package rest
 
 import (
+	"bytes"
+	"fmt"
 	"go.nandlabs.io/commons/ioutils"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/textproto"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"go.nandlabs.io/commons/codec"
@@ -18,30 +23,38 @@ const (
 	pathParamSuffix = "}"
 )
 
-//Request struct holds the http Request for the rest client
-//TODO Add multipart implementation
+// Request struct holds the http Request for the rest client
+// TODO Add multipart implementation
 type Request struct {
-	url         string
-	method      string
-	formData    url.Values
-	queryParam  url.Values
-	pathParams  map[string]string
-	header      http.Header
-	body        any
-	bodyReader  io.Reader
-	contentType string
-	client      *Client
+	url           string
+	method        string
+	formData      url.Values
+	queryParam    url.Values
+	pathParams    map[string]string
+	header        http.Header
+	body          any
+	bodyReader    io.Reader
+	contentType   string
+	client        *Client
+	isMultipart   bool
+	multipartFile *MultipartFile
 }
 
-//Method function prints the current method for this Request
+type MultipartFile struct {
+	ParamName string
+	FilePath  string
+	Params    map[string]string
+}
+
+// Method function prints the current method for this Request
 func (r *Request) Method() string {
 	return r.method
 }
 
-//AddFormData function adds the form data with the name specified by k list of values in order as specified in v
-//If the key does not exist then it creates a new form data by calling url.Values.Set() function on the first key and
+// AddFormData function adds the form data with the name specified by k list of values in order as specified in v
+// If the key does not exist then it creates a new form data by calling url.Values.Set() function on the first key and
 // the value
-//Setting form data will have precedence over to setting body directly.
+// Setting form data will have precedence over to setting body directly.
 func (r *Request) AddFormData(k string, v ...string) *Request {
 	if r.formData == nil {
 		r.formData = url.Values{}
@@ -56,8 +69,8 @@ func (r *Request) AddFormData(k string, v ...string) *Request {
 	return r
 }
 
-//AddQueryParam function adds the query parameter with the name specified by k list of values in order as specified in v
-//If the key does not exist then it creates a new form data by calling url.Values.Set() function passing the first key
+// AddQueryParam function adds the query parameter with the name specified by k list of values in order as specified in v
+// If the key does not exist then it creates a new form data by calling url.Values.Set() function passing the first key
 // and value
 func (r *Request) AddQueryParam(k string, v ...string) *Request {
 	if r.queryParam == nil {
@@ -98,8 +111,36 @@ func (r *Request) SeBodyReader(reader io.Reader) *Request {
 }
 
 func (r *Request) SetContentType(contentType string) *Request {
-	r.SetContentType(contentType)
+	r.contentType = contentType
 	return r
+}
+
+func (r *Request) SetMultipartFile(paramName string, path string, params map[string]string) *Request {
+	r.isMultipart = true
+	r.multipartFile = &MultipartFile{
+		ParamName: paramName,
+		FilePath:  path,
+		Params:    params,
+	}
+	return r
+}
+
+func (r *Request) handleMultipart() (err error) {
+	bodyBuf := new(bytes.Buffer)
+	w := multipart.NewWriter(bodyBuf)
+	err = addFile(w, r.multipartFile.ParamName, r.multipartFile.FilePath)
+
+	err = w.Close()
+	return
+}
+
+func addFile(w *multipart.Writer, fieldName, path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer closeInterface(file)
+	return writeMultipartFormFile(w, fieldName, filepath.Base(path), file)
 }
 
 func (r *Request) toHttpRequest() (httpReq *http.Request, err error) {
@@ -148,11 +189,16 @@ func (r *Request) toHttpRequest() (httpReq *http.Request, err error) {
 					if err == nil {
 						err = c.Write(r.body, pw)
 					}
-
 				}()
 				r.bodyReader = pr
 			}
+
+			if r.isMultipart {
+				err = r.handleMultipart()
+			}
+
 			if err == nil {
+				fmt.Println(r.bodyReader)
 				httpReq, err = http.NewRequest(r.method, u.String(), r.bodyReader)
 				if r.header != nil {
 					if r.contentType != "" {
