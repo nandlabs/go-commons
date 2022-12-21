@@ -3,7 +3,6 @@ package rest
 import (
 	"bytes"
 	"fmt"
-	"go.nandlabs.io/commons/ioutils"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -15,6 +14,7 @@ import (
 
 	"go.nandlabs.io/commons/codec"
 	"go.nandlabs.io/commons/errutils"
+	"go.nandlabs.io/commons/ioutils"
 	"go.nandlabs.io/commons/textutils"
 )
 
@@ -43,7 +43,6 @@ type Request struct {
 type MultipartFile struct {
 	ParamName string
 	FilePath  string
-	Params    map[string]string
 }
 
 // Method function prints the current method for this Request
@@ -115,12 +114,11 @@ func (r *Request) SetContentType(contentType string) *Request {
 	return r
 }
 
-func (r *Request) SetMultipartFile(paramName string, path string, params map[string]string) *Request {
+func (r *Request) SetMultipartFile(paramName string, path string) *Request {
 	r.isMultipart = true
 	r.multipartFile = &MultipartFile{
 		ParamName: paramName,
 		FilePath:  path,
-		Params:    params,
 	}
 	return r
 }
