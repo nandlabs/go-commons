@@ -2,7 +2,6 @@ package rest
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -26,18 +25,19 @@ const (
 // Request struct holds the http Request for the rest client
 // TODO Add multipart implementation
 type Request struct {
-	url           string
-	method        string
-	formData      url.Values
-	queryParam    url.Values
-	pathParams    map[string]string
-	header        http.Header
-	body          any
-	bodyReader    io.Reader
-	contentType   string
-	client        *Client
-	isMultipart   bool
-	multipartFile *MultipartFile
+	url            string
+	method         string
+	formData       url.Values
+	queryParam     url.Values
+	pathParams     map[string]string
+	header         http.Header
+	body           any
+	bodyBuf        *bytes.Buffer
+	bodyReader     io.Reader
+	contentType    string
+	client         *Client
+	isMultipart    bool
+	multiPartFiles []*MultipartFile
 }
 
 type MultipartFile struct {
@@ -114,21 +114,29 @@ func (r *Request) SetContentType(contentType string) *Request {
 	return r
 }
 
-func (r *Request) SetMultipartFile(paramName string, path string) *Request {
+func (r *Request) SetMultipartFiles(data []*MultipartFile) {
 	r.isMultipart = true
-	r.multipartFile = &MultipartFile{
-		ParamName: paramName,
-		FilePath:  path,
+	for _, v := range data {
+		r.multiPartFiles = append(r.multiPartFiles, &MultipartFile{
+			ParamName: v.ParamName,
+			FilePath:  v.FilePath,
+		})
 	}
-	return r
 }
 
 func (r *Request) handleMultipart() (err error) {
-	bodyBuf := new(bytes.Buffer)
-	w := multipart.NewWriter(bodyBuf)
-	err = addFile(w, r.multipartFile.ParamName, r.multipartFile.FilePath)
-
-	err = w.Close()
+	err = validateHeaders(r.method)
+	if err == nil {
+		r.bodyBuf = new(bytes.Buffer)
+		w := multipart.NewWriter(r.bodyBuf)
+		for _, v := range r.multiPartFiles {
+			err = addFile(w, v.ParamName, v.FilePath)
+			if err != nil {
+				return
+			}
+		}
+		err = w.Close()
+	}
 	return
 }
 
@@ -193,10 +201,12 @@ func (r *Request) toHttpRequest() (httpReq *http.Request, err error) {
 
 			if r.isMultipart {
 				err = r.handleMultipart()
+				if err == nil {
+					r.bodyReader = io.MultiReader(r.bodyReader, bytes.NewReader(r.bodyBuf.Bytes()))
+				}
 			}
 
 			if err == nil {
-				fmt.Println(r.bodyReader)
 				httpReq, err = http.NewRequest(r.method, u.String(), r.bodyReader)
 				if r.header != nil {
 					if r.contentType != "" {

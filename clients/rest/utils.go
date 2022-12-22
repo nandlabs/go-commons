@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -39,4 +40,11 @@ func writeMultipartFormFile(w *multipart.Writer, fieldName, fileName string, r i
 
 	_, err = io.Copy(partWriter, r)
 	return err
+}
+
+func validateHeaders(method string) (err error) {
+	if !(method == http.MethodPost || method == http.MethodPut || method == http.MethodPatch) {
+		err = fmt.Errorf("multipart content is now allowed on [%v]", method)
+	}
+	return
 }
