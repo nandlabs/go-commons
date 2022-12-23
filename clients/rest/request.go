@@ -36,7 +36,6 @@ type Request struct {
 	bodyReader     io.Reader
 	contentType    string
 	client         *Client
-	isMultipart    bool
 	multiPartFiles []*MultipartFile
 }
 
@@ -104,6 +103,7 @@ func (r *Request) SetBody(v interface{}) *Request {
 	r.body = v
 	return r
 }
+
 func (r *Request) SeBodyReader(reader io.Reader) *Request {
 	r.bodyReader = reader
 	return r
@@ -114,14 +114,17 @@ func (r *Request) SetContentType(contentType string) *Request {
 	return r
 }
 
-func (r *Request) SetMultipartFiles(data []*MultipartFile) {
-	r.isMultipart = true
-	for _, v := range data {
+func (r *Request) SetMultipartFiles(files ...*MultipartFile) *Request {
+	if r.multiPartFiles == nil {
+		r.multiPartFiles = make([]*MultipartFile, 0)
+	}
+	for _, v := range files {
 		r.multiPartFiles = append(r.multiPartFiles, &MultipartFile{
 			ParamName: v.ParamName,
 			FilePath:  v.FilePath,
 		})
 	}
+	return r
 }
 
 func (r *Request) handleMultipart() (err error) {
@@ -199,7 +202,7 @@ func (r *Request) toHttpRequest() (httpReq *http.Request, err error) {
 				r.bodyReader = pr
 			}
 
-			if r.isMultipart {
+			if len(r.multiPartFiles) > 0 {
 				err = r.handleMultipart()
 				if err == nil {
 					r.bodyReader = io.MultiReader(r.bodyReader, bytes.NewReader(r.bodyBuf.Bytes()))
