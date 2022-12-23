@@ -8,12 +8,6 @@ import (
 	"net/textproto"
 )
 
-func closeInterface(v interface{}) {
-	if c, ok := v.(io.Closer); ok {
-		_ = c.Close()
-	}
-}
-
 func createMultipartHeader(param, fileName, contentType string) textproto.MIMEHeader {
 	hdr := make(textproto.MIMEHeader)
 

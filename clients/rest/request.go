@@ -145,7 +145,7 @@ func addFile(w *multipart.Writer, fieldName, path string) error {
 	if err != nil {
 		return err
 	}
-	defer closeInterface(file)
+	defer ioutils.CloserFunc(file)
 	return writeMultipartFormFile(w, fieldName, filepath.Base(path), file)
 }
 
