@@ -1,5 +1,14 @@
 package secrets
 
-type Secret interface {
-	Get(key string) string
+import (
+	"bytes"
+	"go.nandlabs.io/commons/config"
+	"time"
+)
+
+type Credential struct {
+	Value       *bytes.Buffer
+	LastUpdated time.Time
+	Version     string
+	MetaData    config.Properties
 }
