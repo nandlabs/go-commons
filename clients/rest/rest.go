@@ -2,9 +2,13 @@ package rest
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/base64"
+	"errors"
+	"flag"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 
 	"go.nandlabs.io/commons/clients"
@@ -21,6 +25,12 @@ const (
 	defaultExpectContinueTimeout = 1 * time.Second
 	contentTypeHdr               = "Content-Type"
 	proxyAuthHdr                 = "Proxy-Authorization"
+)
+
+var (
+	certFile = flag.String("cert", "someCertFile", "A PEM encoded certificate file.")
+	keyFile  = flag.String("key", "someKeyFile", "A PEM encoded private key file.")
+	caFile   = flag.String("CA", "someCertCAFile", "A PEM encoded CA's certificate file.")
 )
 
 // TODO Add certificate
@@ -123,6 +133,46 @@ func (c *Client) SetProxy(proxyUrl, user, password string) (err error) {
 	return
 }
 
+func (c *Client) SetCACerts(caFilePath string) (*Client, error) {
+	caCert, err := os.ReadFile(caFilePath)
+	if err != nil {
+		return nil, err
+	}
+
+	conf, err := c.setTlSConfig()
+	if err != nil {
+		return nil, err
+	}
+	if conf.RootCAs == nil {
+		conf.RootCAs = x509.NewCertPool()
+	}
+	conf.RootCAs.AppendCertsFromPEM(caCert)
+
+	c.setSSL(conf)
+	return c, nil
+}
+
+func (c *Client) SetTLSCerts(certs ...tls.Certificate) (*Client, error) {
+	conf, err := c.setTlSConfig()
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range certs {
+		conf.Certificates = append(conf.Certificates, v)
+	}
+	c.setSSL(conf)
+	return c, nil
+}
+
+func (c *Client) setSSL(conf *tls.Config) {
+	// Load client cert
+	c.tlsConfig = conf
+	transport := &http.Transport{
+		TLSClientConfig: conf,
+	}
+	c.httpTransport = transport
+}
+
 func (c *Client) UseEnvProxy(urlParam, userParam, passwdParam string) (err error) {
 	u := config.GetEnvAsString(urlParam, textutils.EmptyStr)
 	user := config.GetEnvAsString(userParam, textutils.EmptyStr)
@@ -213,4 +263,22 @@ func (c *Client) isError(err error, httpRes *http.Response) (isErr bool) {
 func (c *Client) Close() (err error) {
 	c.httpClient.CloseIdleConnections()
 	return
+}
+
+func (c *Client) setTlSConfig() (*tls.Config, error) {
+	transport, err := c.setTransport()
+	if err != nil {
+		return nil, err
+	}
+	if transport.TLSClientConfig == nil {
+		transport.TLSClientConfig = &tls.Config{}
+	}
+	return transport.TLSClientConfig, nil
+}
+
+func (c *Client) setTransport() (*http.Transport, error) {
+	if transport, ok := c.httpClient.Transport.(*http.Transport); ok {
+		return transport, nil
+	}
+	return nil, errors.New("transport is not an *http.transport instance")
 }
