@@ -80,6 +80,10 @@ func (ls *LocalStore) Write(key string, credential *Credential, ctx context.Cont
 	return
 }
 
+func (ls *LocalStore) Provider() string {
+	return LocalStoreProvider
+}
+
 func aesEncrypt(key []byte, message string) (encoded string, err error) {
 	var msgBytes, cipherText []byte
 	var block cipher.Block
