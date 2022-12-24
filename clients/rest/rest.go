@@ -103,7 +103,9 @@ func (c *Client) MaxIdlePerHost(maxIdleConnPerHost int) *Client {
 
 // SSlVerify set the ssl verify value
 func (c *Client) SSlVerify(verify bool) *Client {
-	c.tlsConfig.InsecureSkipVerify = verify
+	c.tlsConfig = &tls.Config{
+		InsecureSkipVerify: verify,
+	}
 	return c
 }
 
@@ -114,7 +116,9 @@ func (c *Client) SetProxy(proxyUrl, user, password string) (err error) {
 	}
 	u, err = url.Parse(proxyUrl)
 	if err == nil {
-		c.httpTransport.Proxy = http.ProxyURL(u)
+		c.httpTransport = &http.Transport{
+			Proxy: http.ProxyURL(u),
+		}
 	}
 	return
 }
