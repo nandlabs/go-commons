@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"crypto/tls"
 	"go.nandlabs.io/commons/codec"
 	"net/http"
 	"reflect"
@@ -70,6 +71,14 @@ func TestClientOptions(t *testing.T) {
 	if reflect.TypeOf(client) != reflect.TypeOf(gotCircuitBreaker) {
 		t.Errorf("NewClient() = %v, want %v", gotCircuitBreaker, client)
 	}
+
+	gotTlsCerts, err := client.SetTLSCerts(tls.Certificate{})
+	if err != nil {
+		t.Errorf("unable to add tls certs")
+	}
+	if reflect.TypeOf(client) != reflect.TypeOf(gotTlsCerts) {
+		t.Errorf("NewClient() = %v, want %v", gotTlsCerts, client)
+	}
 }
 
 func TestClient_NewRequest(t *testing.T) {
@@ -80,6 +89,36 @@ func TestClient_NewRequest(t *testing.T) {
 	}
 	if reflect.TypeOf(req) != reflect.TypeOf(want) {
 		t.Errorf("NewRequest() = %v, want %v", req, want)
+	}
+}
+
+func TestClient_SetCACerts(t *testing.T) {
+	tests := []struct {
+		name     string
+		certPath string
+		want     string
+	}{
+		{
+			name:     "TestClient_SetCACerts_1",
+			certPath: "./testData/test-key.pem",
+			want:     "",
+		},
+		{
+			name:     "TestClient_SetCACerts_2",
+			certPath: "./testData/test-key-temp.pem",
+			want:     "open ./testData/test-key-temp.pem: no such file or directory",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := client.SetCACerts(tt.certPath)
+			if err != nil {
+				if tt.want != err.Error() {
+					t.Errorf("Got: %s, want: %s", err.Error(), tt.want)
+				}
+			}
+		})
 	}
 }
 
