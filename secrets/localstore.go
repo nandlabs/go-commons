@@ -11,39 +11,43 @@ import (
 )
 
 const (
-	LocalStoreProvider = "LocalStore"
+	LocalStoreProvider = "localStore"
 )
 
-//LocalStore will want the credential in a local file.
-type LocalStore struct {
+//localStore will want the credential in a local file.
+type localStore struct {
 	credentials map[string]*Credential
 	storeFile   string
 	masterKey   string
 	mutex       sync.RWMutex
 }
 
-func NewLocalStore(storeFile, masterKey string) (ls *LocalStore, err error) {
+func NewLocalStore(storeFile, masterKey string) (s Store, err error) {
 	var fileContent []byte
 	var decryptedContent []byte
 	var credentials = make(map[string]*Credential)
-	fileContent, err = os.ReadFile(storeFile)
-	if err == nil {
-		decryptedContent, err = AesDecrypt(fileContent, []byte(masterKey))
-		decoder := gob.NewDecoder(bytes.NewReader(decryptedContent))
-		err = decoder.Decode(credentials)
+	var fileInfo os.FileInfo
+	fileInfo, err = os.Stat(storeFile)
+	s = &localStore{
+		credentials: credentials,
+		storeFile:   storeFile,
+		masterKey:   masterKey,
+		mutex:       sync.RWMutex{},
+	}
+	if err == nil && !fileInfo.IsDir() {
+		fileContent, err = os.ReadFile(storeFile)
 		if err == nil {
-			ls = &LocalStore{
-				credentials: credentials,
-				storeFile:   storeFile,
-				masterKey:   masterKey,
-				mutex:       sync.RWMutex{},
-			}
+			decryptedContent, err = AesDecrypt(fileContent, []byte(masterKey))
+			decoder := gob.NewDecoder(bytes.NewReader(decryptedContent))
+			err = decoder.Decode(&credentials)
 		}
+	} else {
+		err = nil
 	}
 	return
 }
 
-func (ls *LocalStore) Get(key string, ctx context.Context) (cred *Credential, err error) {
+func (ls *localStore) Get(key string, ctx context.Context) (cred *Credential, err error) {
 	ls.mutex.RLock()
 	defer ls.mutex.RUnlock()
 	if v, ok := ls.credentials[key]; ok {
@@ -55,7 +59,7 @@ func (ls *LocalStore) Get(key string, ctx context.Context) (cred *Credential, er
 	return
 }
 
-func (ls *LocalStore) Write(key string, credential *Credential, ctx context.Context) (err error) {
+func (ls *localStore) Write(key string, credential *Credential, ctx context.Context) (err error) {
 	ls.mutex.Lock()
 	defer ls.mutex.Unlock()
 	ls.credentials[key] = credential
@@ -72,6 +76,6 @@ func (ls *LocalStore) Write(key string, credential *Credential, ctx context.Cont
 	return
 }
 
-func (ls *LocalStore) Provider() string {
+func (ls *localStore) Provider() string {
 	return LocalStoreProvider
 }

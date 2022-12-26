@@ -1,10 +1,7 @@
 package secrets
 
 import (
-	"go.nandlabs.io/commons/textutils"
 	"time"
-
-	"go.nandlabs.io/commons/config"
 )
 
 const (
@@ -29,7 +26,7 @@ type Credential struct {
 	Value       []byte
 	LastUpdated time.Time
 	Version     string
-	MetaData    *config.Properties
+	MetaData    map[string]interface{}
 }
 
 // Str function gets the Credential.Value field as string
@@ -44,7 +41,9 @@ func (c *Credential) Str() (s string) {
 func (c *Credential) Type() (s string) {
 	s = TextSecret
 	if c.MetaData != nil {
-		s = c.MetaData.Get(CredType, textutils.EmptyStr)
+		if v, ok := c.MetaData[CredType]; ok {
+			s = v.(string)
+		}
 	}
 	return
 }
