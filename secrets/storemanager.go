@@ -7,6 +7,13 @@ type Manager struct {
 	once   sync.Once
 }
 
+func GetManager() *Manager {
+	return &Manager{
+		stores: nil,
+		once:   sync.Once{},
+	}
+}
+
 func (m *Manager) Register(store Store) {
 	if m.stores == nil {
 		m.once.Do(func() {
