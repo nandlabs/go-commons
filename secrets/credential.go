@@ -1,14 +1,23 @@
 package secrets
 
 import (
-	"bytes"
-	"go.nandlabs.io/commons/config"
 	"time"
+
+	"go.nandlabs.io/commons/config"
 )
 
 type Credential struct {
-	Value       *bytes.Buffer
+	Value       []byte
 	LastUpdated time.Time
 	Version     string
 	MetaData    config.Properties
+}
+
+func (c *Credential) Str() (s string) {
+
+	if c.Value != nil {
+		s = string(c.Value)
+	}
+
+	return
 }
