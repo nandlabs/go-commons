@@ -17,7 +17,7 @@ func TestAes(t *testing.T) {
 		{
 			name: "simple-message-16bit",
 			args: args{
-				key:     "This12BitKey",
+				key:     "This12BitKey0001",
 				message: "This is a simple message",
 			},
 			wantErr: false,
