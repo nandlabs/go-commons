@@ -1,7 +1,6 @@
 package fnutils
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -17,11 +16,9 @@ func ExecuteAfterMin(fn func(), timeout int) {
 }
 
 func ExecuteAfter(fn func(), timeout time.Duration) {
-	fmt.Println("Setting Timeout", timeout)
 	select {
 	case <-time.After(timeout):
 		{
-			fmt.Println("Executing after timeout")
 			fn()
 		}
 	}
