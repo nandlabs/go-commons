@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"errors"
-	"flag"
 	"net/http"
 	"net/url"
 	"os"
@@ -25,12 +24,6 @@ const (
 	defaultExpectContinueTimeout = 1 * time.Second
 	contentTypeHdr               = "Content-Type"
 	proxyAuthHdr                 = "Proxy-Authorization"
-)
-
-var (
-	certFile = flag.String("cert", "someCertFile", "A PEM encoded certificate file.")
-	keyFile  = flag.String("key", "someKeyFile", "A PEM encoded private key file.")
-	caFile   = flag.String("CA", "someCertCAFile", "A PEM encoded CA's certificate file.")
 )
 
 // TODO Add certificate
