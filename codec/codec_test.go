@@ -77,7 +77,6 @@ func TestNewXmlCodec(t *testing.T) {
 	if err := c.Write(m, buf); err != nil {
 		t.Errorf("error in write: %d", err)
 	}
-	// fmt.Println(buf)
 	const want = `<XMLMessage><name>Test</name><body>Hello</body><time>123124124</time></XMLMessage>`
 	if got := buf; got.String() != want {
 		t.Errorf("got %q, want %q", got.String(), want)
