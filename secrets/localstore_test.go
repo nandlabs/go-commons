@@ -2,6 +2,8 @@ package secrets
 
 import (
 	"context"
+	"os"
+	"path"
 	"reflect"
 	"sync"
 	"testing"
@@ -9,6 +11,7 @@ import (
 )
 
 func TestLocalStore_Get(t *testing.T) {
+
 	type StoreStub struct {
 		credentials map[string]*Credential
 		storeFile   string
@@ -30,7 +33,7 @@ func TestLocalStore_Get(t *testing.T) {
 			name: "testGet",
 			fields: StoreStub{
 				credentials: map[string]*Credential{
-					"test": &Credential{
+					"test": {
 						Value:       []byte("testValue"),
 						LastUpdated: time.Now(),
 						Version:     "1.0",
@@ -114,6 +117,7 @@ func TestLocalStore_Provider(t *testing.T) {
 }
 
 func TestLocalStore_Write(t *testing.T) {
+	dir, err := os.Getwd()
 	type fields struct {
 		credentials map[string]*Credential
 		storeFile   string
@@ -132,7 +136,26 @@ func TestLocalStore_Write(t *testing.T) {
 		wantErr bool
 	}{
 
-		// TODO: Add test cases.
+		{
+			name: "write-test",
+			fields: fields{
+				credentials: make(map[string]*Credential),
+				storeFile:   path.Join(dir, "testdata", "test-store.dat"),
+				masterKey:   "thisisamasterkey",
+				mutex:       sync.RWMutex{},
+			},
+			args: args{
+				key: "test-key-01",
+				credential: &Credential{
+					Value:       []byte("test-value"),
+					LastUpdated: time.Now(),
+					Version:     "1.0",
+					MetaData:    nil,
+				},
+				ctx: nil,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -142,7 +165,7 @@ func TestLocalStore_Write(t *testing.T) {
 				masterKey:   tt.fields.masterKey,
 				mutex:       tt.fields.mutex,
 			}
-			if err := ls.Write(tt.args.key, tt.args.credential, tt.args.ctx); (err != nil) != tt.wantErr {
+			if err = ls.Write(tt.args.key, tt.args.credential, tt.args.ctx); (err != nil) != tt.wantErr {
 				t.Errorf("Write() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
