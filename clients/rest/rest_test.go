@@ -52,11 +52,6 @@ func TestClientOptions(t *testing.T) {
 		t.Errorf("NewClient() = %v, want %v", gotMaxIdlePerHost, client)
 	}
 
-	gotSSlVerify := client.SSlVerify(false)
-	if reflect.TypeOf(client) != reflect.TypeOf(gotSSlVerify) {
-		t.Errorf("NewClient() = %v, want %v", gotSSlVerify, client)
-	}
-
 	gotEndProxy := client.UseEnvProxy("test.com", "test", "test")
 	if gotEndProxy != nil {
 		t.Errorf("NewClient() = %v, want %v", gotEndProxy, client)
@@ -119,6 +114,30 @@ func TestClient_SetCACerts(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestClient_SetCACerts2(t *testing.T) {
+	want := ""
+	_, err := client.SetCACerts("./testData/test-key.pem", "./testData/test-key-2.pem")
+	if err != nil {
+		t.Errorf("Got: %s, want: %s", err.Error(), want)
+	}
+}
+
+func TestClient_SSlVerify(t *testing.T) {
+	clientSSLVerify, err := client.SSlVerify(true)
+	if reflect.TypeOf(clientSSLVerify) != reflect.TypeOf(client) {
+		t.Errorf("Got: %s, want: %s", reflect.TypeOf(clientSSLVerify), reflect.TypeOf(client))
+	}
+
+	want := ""
+	_, err = client.SetCACerts("./testData/test-key.pem", "./testData/test-key-2.pem")
+	if err != nil {
+		t.Errorf("Got: %s, want: %s", err.Error(), want)
+	}
+	if client.tlsConfig.InsecureSkipVerify != true {
+		t.Error("client SSL setup incorrect")
 	}
 }
 

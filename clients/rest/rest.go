@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
-	"errors"
 	"net/http"
 	"net/url"
 	"os"
@@ -105,11 +104,13 @@ func (c *Client) MaxIdlePerHost(maxIdleConnPerHost int) *Client {
 }
 
 // SSlVerify set the ssl verify value
-func (c *Client) SSlVerify(verify bool) *Client {
-	c.tlsConfig = &tls.Config{
-		InsecureSkipVerify: verify,
+func (c *Client) SSlVerify(verify bool) (*Client, error) {
+	conf, err := c.setTlSConfig()
+	if err != nil {
+		return nil, err
 	}
-	return c
+	conf.InsecureSkipVerify = verify
+	return c, nil
 }
 
 func (c *Client) SetProxy(proxyUrl, user, password string) (err error) {
@@ -126,12 +127,7 @@ func (c *Client) SetProxy(proxyUrl, user, password string) (err error) {
 	return
 }
 
-func (c *Client) SetCACerts(caFilePath string) (*Client, error) {
-	caCert, err := os.ReadFile(caFilePath)
-	if err != nil {
-		return nil, err
-	}
-
+func (c *Client) SetCACerts(caFilePath ...string) (*Client, error) {
 	conf, err := c.setTlSConfig()
 	if err != nil {
 		return nil, err
@@ -139,8 +135,13 @@ func (c *Client) SetCACerts(caFilePath string) (*Client, error) {
 	if conf.RootCAs == nil {
 		conf.RootCAs = x509.NewCertPool()
 	}
-	conf.RootCAs.AppendCertsFromPEM(caCert)
-
+	for _, v := range caFilePath {
+		caCert, err := os.ReadFile(v)
+		if err != nil {
+			return nil, err
+		}
+		conf.RootCAs.AppendCertsFromPEM(caCert)
+	}
 	c.setSSL(conf)
 	return c, nil
 }
@@ -259,19 +260,8 @@ func (c *Client) Close() (err error) {
 }
 
 func (c *Client) setTlSConfig() (*tls.Config, error) {
-	transport, err := c.setTransport()
-	if err != nil {
-		return nil, err
+	if c.tlsConfig != nil {
+		return c.tlsConfig, nil
 	}
-	if transport.TLSClientConfig == nil {
-		transport.TLSClientConfig = &tls.Config{}
-	}
-	return transport.TLSClientConfig, nil
-}
-
-func (c *Client) setTransport() (*http.Transport, error) {
-	if transport, ok := c.httpClient.Transport.(*http.Transport); ok {
-		return transport, nil
-	}
-	return nil, errors.New("transport is not an *http.transport instance")
+	return &tls.Config{}, nil
 }
