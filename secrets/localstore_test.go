@@ -6,8 +6,6 @@ import (
 	"sync"
 	"testing"
 	"time"
-
-	"go.nandlabs.io/commons/config"
 )
 
 func TestLocalStore_Get(t *testing.T) {
@@ -36,7 +34,7 @@ func TestLocalStore_Get(t *testing.T) {
 						Value:       []byte("testValue"),
 						LastUpdated: time.Now(),
 						Version:     "1.0",
-						MetaData:    &config.Properties{},
+						MetaData:    nil,
 					},
 				},
 				storeFile: "test-File",
@@ -51,14 +49,14 @@ func TestLocalStore_Get(t *testing.T) {
 				Value:       []byte("testValue"),
 				LastUpdated: time.Now(),
 				Version:     "1.0",
-				MetaData:    &config.Properties{},
+				MetaData:    nil,
 			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ls := &LocalStore{
+			ls := &localStore{
 				credentials: tt.fields.credentials,
 				storeFile:   tt.fields.storeFile,
 				masterKey:   tt.fields.masterKey,
@@ -88,11 +86,21 @@ func TestLocalStore_Provider(t *testing.T) {
 		fields fields
 		want   string
 	}{
-		// TODO: Add test cases.
+
+		{
+			name: "local-provider-test",
+			fields: fields{
+				credentials: nil,
+				storeFile:   "",
+				masterKey:   "",
+				mutex:       sync.RWMutex{},
+			},
+			want: LocalStoreProvider,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ls := &LocalStore{
+			ls := &localStore{
 				credentials: tt.fields.credentials,
 				storeFile:   tt.fields.storeFile,
 				masterKey:   tt.fields.masterKey,
@@ -123,11 +131,12 @@ func TestLocalStore_Write(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
+
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ls := &LocalStore{
+			ls := &localStore{
 				credentials: tt.fields.credentials,
 				storeFile:   tt.fields.storeFile,
 				masterKey:   tt.fields.masterKey,
@@ -148,7 +157,7 @@ func TestNewLocalStore(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantLs  *LocalStore
+		wantLs  *localStore
 		wantErr bool
 	}{
 		// TODO: Add test cases.
