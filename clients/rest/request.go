@@ -23,7 +23,6 @@ const (
 )
 
 // Request struct holds the http Request for the rest client
-// TODO Add multipart implementation
 type Request struct {
 	url            string
 	method         string

@@ -25,7 +25,7 @@ const (
 	proxyAuthHdr                 = "Proxy-Authorization"
 )
 
-// TODO Add certificate
+//Client Object
 type Client struct {
 	retryInfo      *clients.RetryInfo
 	circuitBreaker *clients.CircuitBreaker
@@ -127,6 +127,8 @@ func (c *Client) SetProxy(proxyUrl, user, password string) (err error) {
 	return
 }
 
+//SetCACerts can take a list of caFilePaths and will add it as the x509 CertPool to the *tls.Config.RootCAs
+//The Order of addition is same as the order as they are presented in the paramter
 func (c *Client) SetCACerts(caFilePath ...string) (*Client, error) {
 	conf, err := c.setTlSConfig()
 	if err != nil {
@@ -146,6 +148,7 @@ func (c *Client) SetCACerts(caFilePath ...string) (*Client, error) {
 	return c, nil
 }
 
+//SetTLSCerts will set a list of client certificate ket pair.
 func (c *Client) SetTLSCerts(certs ...tls.Certificate) (*Client, error) {
 	conf, err := c.setTlSConfig()
 	if err != nil {
@@ -167,6 +170,7 @@ func (c *Client) setSSL(conf *tls.Config) {
 	c.httpTransport = transport
 }
 
+//UseEnvProxy will ensure that the proxy settings are loaded using ENV parameters.
 func (c *Client) UseEnvProxy(urlParam, userParam, passwdParam string) (err error) {
 	u := config.GetEnvAsString(urlParam, textutils.EmptyStr)
 	user := config.GetEnvAsString(userParam, textutils.EmptyStr)
