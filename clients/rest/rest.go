@@ -2,9 +2,11 @@ package rest
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/base64"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 
 	"go.nandlabs.io/commons/clients"
@@ -102,11 +104,13 @@ func (c *Client) MaxIdlePerHost(maxIdleConnPerHost int) *Client {
 }
 
 // SSlVerify set the ssl verify value
-func (c *Client) SSlVerify(verify bool) *Client {
-	c.tlsConfig = &tls.Config{
-		InsecureSkipVerify: verify,
+func (c *Client) SSlVerify(verify bool) (*Client, error) {
+	conf, err := c.setTlSConfig()
+	if err != nil {
+		return nil, err
 	}
-	return c
+	conf.InsecureSkipVerify = verify
+	return c, nil
 }
 
 func (c *Client) SetProxy(proxyUrl, user, password string) (err error) {
@@ -121,6 +125,46 @@ func (c *Client) SetProxy(proxyUrl, user, password string) (err error) {
 		}
 	}
 	return
+}
+
+func (c *Client) SetCACerts(caFilePath ...string) (*Client, error) {
+	conf, err := c.setTlSConfig()
+	if err != nil {
+		return nil, err
+	}
+	if conf.RootCAs == nil {
+		conf.RootCAs = x509.NewCertPool()
+	}
+	for _, v := range caFilePath {
+		caCert, err := os.ReadFile(v)
+		if err != nil {
+			return nil, err
+		}
+		conf.RootCAs.AppendCertsFromPEM(caCert)
+	}
+	c.setSSL(conf)
+	return c, nil
+}
+
+func (c *Client) SetTLSCerts(certs ...tls.Certificate) (*Client, error) {
+	conf, err := c.setTlSConfig()
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range certs {
+		conf.Certificates = append(conf.Certificates, v)
+	}
+	c.setSSL(conf)
+	return c, nil
+}
+
+func (c *Client) setSSL(conf *tls.Config) {
+	// Load client cert
+	c.tlsConfig = conf
+	transport := &http.Transport{
+		TLSClientConfig: conf,
+	}
+	c.httpTransport = transport
 }
 
 func (c *Client) UseEnvProxy(urlParam, userParam, passwdParam string) (err error) {
@@ -213,4 +257,11 @@ func (c *Client) isError(err error, httpRes *http.Response) (isErr bool) {
 func (c *Client) Close() (err error) {
 	c.httpClient.CloseIdleConnections()
 	return
+}
+
+func (c *Client) setTlSConfig() (*tls.Config, error) {
+	if c.tlsConfig != nil {
+		return c.tlsConfig, nil
+	}
+	return &tls.Config{}, nil
 }
