@@ -1,5 +1,10 @@
 package semver
 
+import (
+	"errors"
+	"strconv"
+)
+
 func parseInt(input string) (t, rest string, ok bool) {
 	if input == "" {
 		return
@@ -182,4 +187,13 @@ func isNum(v string) bool {
 		i++
 	}
 	return i == len(v)
+}
+
+func processNextVersion(ver string) (string, error) {
+	nm, err := strconv.Atoi(ver)
+	if err != nil {
+		return "", errors.New("unable to parse major version")
+	}
+	nm = nm + 1
+	return strconv.Itoa(nm), nil
 }

@@ -2,7 +2,7 @@ package semver
 
 import (
 	"errors"
-	"strconv"
+	"strings"
 )
 
 type version struct {
@@ -28,24 +28,50 @@ func GetNextMajor(version string) (string, error) {
 	if !ok {
 		return "", errors.New("error parsing semantic version")
 	}
-	if parsed.major > "0" && parsed.major < "9" {
-		nm, err := strconv.Atoi(parsed.major)
-		if err != nil {
-
-		}
-		nm = nm + 1
-		return strconv.Itoa(nm), nil
-	} else {
-		return "", errors.New("cannot generate next acceptable major version")
+	major, err := processNextVersion(parsed.major)
+	if err != nil {
+		return "", err
 	}
+	parsed.major = major
+	builtVersion, err := buildSemver(parsed)
+	if err != nil {
+		return "", err
+	}
+	return builtVersion, nil
 }
 
-func GetNextMinor() {
-
+func GetNextMinor(version string) (string, error) {
+	parsed, ok := parse(version)
+	if !ok {
+		return "", errors.New("error parsing semantic version")
+	}
+	minor, err := processNextVersion(parsed.minor)
+	if err != nil {
+		return "", err
+	}
+	parsed.minor = minor
+	builtVersion, err := buildSemver(parsed)
+	if err != nil {
+		return "", err
+	}
+	return builtVersion, nil
 }
 
-func GetNextPatch() {
-
+func GetNextPatch(version string) (string, error) {
+	parsed, ok := parse(version)
+	if !ok {
+		return "", errors.New("error parsing semantic version")
+	}
+	patch, err := processNextVersion(parsed.patch)
+	if err != nil {
+		return "", err
+	}
+	parsed.minor = patch
+	builtVersion, err := buildSemver(parsed)
+	if err != nil {
+		return "", err
+	}
+	return builtVersion, nil
 }
 
 func IsPreRelease() bool {
@@ -105,6 +131,15 @@ func parse(input string) (v version, ok bool) {
 	return
 }
 
-func buildSemver(input string) (string, error) {
-
+func buildSemver(input version) (string, error) {
+	versionArr := []string{input.major, input.minor, input.patch}
+	builtVersion := strings.Join(versionArr, ".")
+	builtVersion = "v" + builtVersion
+	if input.preRelease != "" {
+		builtVersion = builtVersion + "-" + input.preRelease
+	}
+	if input.build != "" {
+		builtVersion = builtVersion + "+" + input.build
+	}
+	return builtVersion, nil
 }

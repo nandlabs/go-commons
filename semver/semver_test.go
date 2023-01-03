@@ -1,6 +1,7 @@
 package semver
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -74,5 +75,21 @@ func TestGetNextMajor(t *testing.T) {
 			version: "v1.2.3",
 			want:    nil,
 		},
+		{
+			name:    "GetNextMajor_2",
+			version: "v9.1.1",
+			want:    nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GetNextMajor(tt.version)
+			if tt.want != nil && err.Error() != tt.want.Error() {
+				t.Errorf("Error in comparing version :: got %d, want %d", err, tt.want)
+			}
+			if got != "" {
+				fmt.Println(got)
+			}
+		})
 	}
 }
