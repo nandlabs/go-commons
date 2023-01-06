@@ -66,7 +66,7 @@ func GetNextPatch(version string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	parsed.minor = patch
+	parsed.patch = patch
 	builtVersion, err := buildSemver(parsed)
 	if err != nil {
 		return "", err
@@ -74,7 +74,11 @@ func GetNextPatch(version string) (string, error) {
 	return builtVersion, nil
 }
 
-func IsPreRelease() bool {
+func IsPreRelease(input string) bool {
+	pre := strings.Split(input, "-")
+	if len(pre) > 1 {
+		return true
+	}
 	return false
 }
 
