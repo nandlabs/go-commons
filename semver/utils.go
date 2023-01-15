@@ -1,75 +1,5 @@
 package semver
 
-import (
-	"errors"
-	"strconv"
-)
-
-func parseInt(input string) (t, rest string, ok bool) {
-	if input == "" {
-		return
-	}
-	if input[0] < '0' || '9' < input[0] {
-		return
-	}
-	i := 1
-	for i < len(input) && '0' <= input[i] && input[i] <= '9' {
-		i++
-	}
-	if input[0] == '0' && i != 1 {
-		return
-	}
-	return input[:i], input[i:], true
-}
-
-func parsePreRelease(input string) (t, rest string, ok bool) {
-	if input == "" || input[0] != '-' {
-		return
-	}
-	i := 1
-	start := 1
-	for i < len(input) && input[i] != '+' {
-		if !isIdentChar(input[i]) && input[i] != '.' {
-			return
-		}
-		if input[i] == '.' {
-			if start == i || isBadNum(input[start:i]) {
-				return
-			}
-			start = i + 1
-		}
-		i++
-	}
-	if start == i || isBadNum(input[start:i]) {
-		return
-	}
-	return input[:i], input[i:], true
-}
-
-func parseBuild(input string) (t, rest string, ok bool) {
-	if input == "" || input[0] != '+' {
-		return
-	}
-	i := 1
-	start := 1
-	for i < len(input) {
-		if !isIdentChar(input[i]) && input[i] != '.' {
-			return
-		}
-		if input[i] == '.' {
-			if start == i {
-				return
-			}
-			start = i + 1
-		}
-		i++
-	}
-	if start == i {
-		return
-	}
-	return input[:i], input[i:], true
-}
-
 func isIdentChar(c byte) bool {
 	return 'A' <= c && c <= 'Z' || 'a' <= c && c <= 'z' || '0' <= c && c <= '9' || c == '-'
 }
@@ -187,13 +117,4 @@ func isNum(v string) bool {
 		i++
 	}
 	return i == len(v)
-}
-
-func processNextVersion(ver string) (string, error) {
-	nm, err := strconv.Atoi(ver)
-	if err != nil {
-		return "", errors.New("unable to parse major version")
-	}
-	nm = nm + 1
-	return strconv.Itoa(nm), nil
 }
