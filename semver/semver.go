@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -24,9 +25,13 @@ func ParseSemver(input string) (SemVer, error) {
 	return parsed, err
 }
 
-func CompareSemver(ver1, ver2 string) int {
-	ok := compare(ver1, ver2)
-	return ok
+// CompareSemver returns three values -1, 0, +1
+// -1 denotes ver1 < ver2
+// 0 denotes invalid input
+// +1 denotes ver1 > ver2
+func CompareSemver(ver1, ver2 string) (int, error) {
+	ok, err := compare(ver1, ver2)
+	return ok, err
 }
 
 func GetNextMajor(version string) (string, error) {
@@ -63,6 +68,8 @@ func GetNextPatch(version string) (string, error) {
 }
 
 func IsPreRelease(input string) (bool, error) {
+	input = strings.TrimPrefix(input, "v")
+	input = strings.TrimPrefix(input, " ")
 	semverRegex := regexp.MustCompile(RegexPreRelease)
 	match := semverRegex.FindStringSubmatch(input)
 	if match == nil {
@@ -72,6 +79,10 @@ func IsPreRelease(input string) (bool, error) {
 }
 
 func parseSemver(version string) (SemVer, error) {
+
+	version = strings.TrimPrefix(version, "v")
+	version = strings.TrimPrefix(version, " ")
+
 	semverRegex := regexp.MustCompile(RegexSemver)
 	match := semverRegex.FindStringSubmatch(version)
 	if match == nil {
@@ -104,16 +115,3 @@ func parseSemver(version string) (SemVer, error) {
 		build:      build,
 	}, nil
 }
-
-//func buildSemver(input version) (string, error) {
-//	versionArr := []string{input.major, input.minor, input.patch}
-//	builtVersion := strings.Join(versionArr, ".")
-//	builtVersion = "v" + builtVersion
-//	if input.preRelease != "" {
-//		builtVersion = builtVersion + "-" + input.preRelease
-//	}
-//	if input.build != "" {
-//		builtVersion = builtVersion + "+" + input.build
-//	}
-//	return builtVersion, nil
-//}
