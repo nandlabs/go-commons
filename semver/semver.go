@@ -105,7 +105,7 @@ func parseSemver(version string) (SemVer, error) {
 	}
 
 	preRelease := match[5]
-	build := match[9]
+	build := match[8]
 
 	return SemVer{
 		major:      major,

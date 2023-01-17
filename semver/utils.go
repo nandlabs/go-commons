@@ -1,6 +1,9 @@
 package semver
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // compare returns an integer with 3 possible values, -1, 0, +1
 func compare(ver1, ver2 string) (int, error) {
@@ -43,66 +46,20 @@ func compare(ver1, ver2 string) (int, error) {
 }
 
 func comparePreRelease(v1, v2 string) (int, error) {
-	if v1 == v2 {
-		return 0, fmt.Errorf("equal pre-release versions")
+
+	pre1 := len(v1) > 1
+	pre2 := len(v2) > 1
+
+	if pre1 && pre2 {
+		return strings.Compare(v1, v2), nil
 	}
-	if v1 == "" && v2 != "" {
-		return 1, nil
-	}
-	if v2 == "" && v1 != "" {
+	if pre1 {
 		return -1, nil
 	}
 
-	for v1 != "" && v2 != "" {
-		v1 = v1[1:]
-		v2 = v2[1:]
-		var x, y string
-		x, v1 = nextIdent(v1)
-		y, v2 = nextIdent(v2)
-		if x != y {
-			ix := isNum(x)
-			iy := isNum(y)
-			if ix != iy {
-				if ix {
-					return -1, nil
-				} else {
-					return 1, nil
-				}
-			}
-			if ix {
-				if len(x) < len(y) {
-					return -1, nil
-				}
-				if len(x) > len(y) {
-					return 1, nil
-				}
-			}
-			if x < y {
-				return -1, nil
-			} else {
-				return 1, nil
-			}
-		}
-	}
-	if v1 == "" {
-		return -1, nil
-	} else {
+	if pre2 {
 		return 1, nil
 	}
-}
 
-func nextIdent(x string) (dx, rest string) {
-	i := 0
-	for i < len(x) && x[i] != '.' {
-		i++
-	}
-	return x[:i], x[i:]
-}
-
-func isNum(v string) bool {
-	i := 0
-	for i < len(v) && '0' <= v[i] && v[i] <= '9' {
-		i++
-	}
-	return i == len(v)
+	return 0, fmt.Errorf("no pre-release versions present")
 }

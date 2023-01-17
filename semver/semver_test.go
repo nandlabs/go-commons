@@ -6,54 +6,55 @@ import (
 
 func TestSemver(t *testing.T) {
 	tests := []struct {
-		name    string
 		version string
-		want    SemVer
+		want    any
 	}{
-		{
-			name:    "TestParseSemver_1",
-			version: "v1.2.3",
-			want: SemVer{
-				major:      1,
-				minor:      2,
-				patch:      3,
-				preRelease: "",
-				build:      "",
-			},
-		},
-		{
-			name:    "TestParseSemver_2",
-			version: "1.2.3",
-			want: SemVer{
-				major:      1,
-				minor:      2,
-				patch:      3,
-				preRelease: "",
-				build:      "",
-			},
-		},
-		{
-			name:    "TestParseSemver_3",
-			version: "1.2.3-alpha.1+build.1",
-			want: SemVer{
-				major:      1,
-				minor:      2,
-				patch:      3,
-				preRelease: "alpha.1",
-				build:      ".1",
-			},
-		},
+		{"v1.2.3", SemVer{major: 1, minor: 2, patch: 3, preRelease: "", build: ""}},
+		{"1.2.3", SemVer{major: 1, minor: 2, patch: 3, preRelease: "", build: ""}},
+		{"1.2.3-alpha.1+build.1", SemVer{major: 1, minor: 2, patch: 3, preRelease: "alpha.1", build: "build.1"}},
+		{"hello", "invalid semantic version string"},
+		{"v1-alpha.beta.gamma", "invalid semantic version string"},
+		{"v1-pre", "invalid semantic version string"},
+		{"v1+build", "invalid semantic version string"},
+		{"v1-pre+build", "invalid semantic version string"},
+		{"v1.2-pre+meta", "invalid semantic version string"},
+		{"v1.0.0-alpha", SemVer{major: 1, minor: 0, patch: 0, preRelease: "alpha", build: ""}},
+		{"v1.0.0-alpha.1", SemVer{major: 1, minor: 0, patch: 0, preRelease: "alpha.1", build: ""}},
+		{"v1.0.0-alpha.beta", SemVer{major: 1, minor: 0, patch: 0, preRelease: "alpha.beta", build: ""}},
+		{"v1.0.0-beta", SemVer{major: 1, minor: 0, patch: 0, preRelease: "beta", build: ""}},
+		{"v1.0.0-beta.2", SemVer{major: 1, minor: 0, patch: 0, preRelease: "beta.2", build: ""}},
+		{"v1.0.0-beta.11", SemVer{major: 1, minor: 0, patch: 0, preRelease: "beta.11", build: ""}},
+		{"v1.0.0-rc.1", SemVer{major: 1, minor: 0, patch: 0, preRelease: "rc.1", build: ""}},
+		{"v1", "invalid semantic version string"},
+		{"v1.0", "invalid semantic version string"},
+		{"a.b.c", "invalid semantic version string"},
+		{"v1.0.0", SemVer{major: 1, minor: 0, patch: 0, preRelease: "", build: ""}},
+		{"v1.2", "invalid semantic version string"},
+		{"v1.2.0", SemVer{major: 1, minor: 2, patch: 0, preRelease: "", build: ""}},
+		{"v1.2.3-456", SemVer{major: 1, minor: 2, patch: 3, preRelease: "456", build: ""}},
+		{"v1.2.3-456.789", SemVer{major: 1, minor: 2, patch: 3, preRelease: "456.789", build: ""}},
+		{"v1.2.3-456-789", SemVer{major: 1, minor: 2, patch: 3, preRelease: "456-789", build: ""}},
+		{"v1.2.3-456a", SemVer{major: 1, minor: 2, patch: 3, preRelease: "456a", build: ""}},
+		{"v1.2.3-pre", SemVer{major: 1, minor: 2, patch: 3, preRelease: "pre", build: ""}},
+		{"v1.2.3-pre+meta", SemVer{major: 1, minor: 2, patch: 3, preRelease: "pre", build: "meta"}},
+		{"v1.2.3-pre.1", SemVer{major: 1, minor: 2, patch: 3, preRelease: "pre.1", build: ""}},
+		{"v1.2.3-zzz", SemVer{major: 1, minor: 2, patch: 3, preRelease: "zzz", build: ""}},
+		{"v1.2.3", SemVer{major: 1, minor: 2, patch: 3, preRelease: "", build: ""}},
+		{"v1.2.3+meta", SemVer{major: 1, minor: 2, patch: 3, preRelease: "", build: "meta"}},
+		{"v1.2.3+meta-pre", SemVer{major: 1, minor: 2, patch: 3, preRelease: "", build: "meta-pre"}},
+		{"v1.2.3+meta-pre.sha.256a", SemVer{major: 1, minor: 2, patch: 3, preRelease: "", build: "meta-pre.sha.256a"}},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := ParseSemver(tt.version)
-			if err != nil {
-				t.Errorf("Error in parsing version :: got %t", err)
+		got, err := ParseSemver(tt.version)
+		if err != nil {
+			if err.Error() != tt.want {
+				t.Errorf("Error :: got %t, expected %t", err, tt.want)
 			}
+		} else {
 			if got != tt.want {
 				t.Errorf("Invalid output :: want %+v, got :: %+v", tt.want, got)
 			}
-		})
+		}
 	}
 }
 
@@ -62,7 +63,7 @@ func TestCompareSemver(t *testing.T) {
 		name string
 		ver1 string
 		ver2 string
-		want int
+		want any
 	}{
 		{
 			name: "TestCompareSemver_1",
@@ -112,16 +113,55 @@ func TestCompareSemver(t *testing.T) {
 			ver2: "v2.3.4",
 			want: -1,
 		},
+		{
+			name: "TestCompareSemver_9",
+			ver1: "1.2.3-alpha",
+			ver2: "1.2.3-beta",
+			want: -1,
+		},
+		{
+			name: "TestCompareSemver_10",
+			ver1: "1.2.3-beta",
+			ver2: "1.2.3-alpha",
+			want: 1,
+		},
+		{
+			name: "TestCompareSemver_10",
+			ver1: "1.2.3-beta",
+			ver2: "1.2.3",
+			want: -1,
+		},
+		{
+			name: "TestCompareSemver_11",
+			ver1: "1.2.3",
+			ver2: "1.2.3-pre",
+			want: 1,
+		},
+		{
+			name: "TestCompareSemver_12",
+			ver1: "a.b.c",
+			ver2: "e.f.g",
+			want: "invalid semantic version string",
+		},
+		{
+			name: "TestCompareSemver_13",
+			ver1: "1.2.5",
+			ver2: "e.f.g",
+			want: "invalid semantic version string",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := CompareSemver(tt.ver1, tt.ver2)
 			if err != nil {
-				t.Errorf("Error comparing version :: got %t", err)
-			}
-			if got != tt.want {
-				t.Errorf("Error in comparing version :: got %d, want %d", got, tt.want)
+				if err.Error() != tt.want {
+					t.Errorf("Error :: got %t, expected %t", err, tt.want)
+				}
+			} else {
+				if got != tt.want {
+					t.Errorf("Error in comparing version :: got %d, want %d", got, tt.want)
+				}
 			}
 		})
 	}
@@ -131,7 +171,7 @@ func TestGetNextMajor(t *testing.T) {
 	tests := []struct {
 		name    string
 		version string
-		want    string
+		want    any
 	}{
 		{
 			name:    "TestGetNextMajor_1",
@@ -143,15 +183,19 @@ func TestGetNextMajor(t *testing.T) {
 			version: "v9.1.1",
 			want:    "10.0.0",
 		},
+		{"TestGetNextMajor_3", "v1.0", "invalid semantic version string"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := GetNextMajor(tt.version)
 			if err != nil {
-				t.Errorf("Error fetching next major :: got %t", err)
-			}
-			if got != tt.want {
-				t.Errorf("invalid next major :: got %v, want %v", got, tt.want)
+				if err.Error() != tt.want {
+					t.Errorf("Error :: got %t, expected %t", err, tt.want)
+				}
+			} else {
+				if got != tt.want {
+					t.Errorf("invalid next major :: got %v, want %v", got, tt.want)
+				}
 			}
 		})
 	}
@@ -161,7 +205,7 @@ func TestGetNextMinor(t *testing.T) {
 	tests := []struct {
 		name    string
 		version string
-		want    string
+		want    any
 	}{
 		{
 			name:    "TestGetNextMinor_1",
@@ -173,15 +217,19 @@ func TestGetNextMinor(t *testing.T) {
 			version: "v9.1.1",
 			want:    "9.2.0",
 		},
+		{"TestGetNextMinor_3", "v1.0", "invalid semantic version string"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := GetNextMinor(tt.version)
 			if err != nil {
-				t.Errorf("Error fetching next minor :: got %t", err)
-			}
-			if got != tt.want {
-				t.Errorf("invalid next minor :: got %v, want %v", got, tt.want)
+				if err.Error() != tt.want {
+					t.Errorf("Error :: got %t, expected %t", err, tt.want)
+				}
+			} else {
+				if got != tt.want {
+					t.Errorf("invalid next minor :: got %v, want %v", got, tt.want)
+				}
 			}
 		})
 	}
@@ -191,7 +239,7 @@ func TestGetNextPatch(t *testing.T) {
 	tests := []struct {
 		name    string
 		version string
-		want    string
+		want    any
 	}{
 		{
 			name:    "TestGetNextPatch_1",
@@ -203,15 +251,19 @@ func TestGetNextPatch(t *testing.T) {
 			version: "v9.1.1",
 			want:    "9.1.2",
 		},
+		{"TestGetNextPatch_3", "v1.0", "invalid semantic version string"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := GetNextPatch(tt.version)
 			if err != nil {
-				t.Errorf("Error fetching next patch :: got %t", err)
-			}
-			if got != tt.want {
-				t.Errorf("invalid next patch :: got %v, want %v", got, tt.want)
+				if err.Error() != tt.want {
+					t.Errorf("Error :: got %t, expected %t", err, tt.want)
+				}
+			} else {
+				if got != tt.want {
+					t.Errorf("invalid next patch :: got %v, want %v", got, tt.want)
+				}
 			}
 		})
 	}
