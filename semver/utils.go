@@ -6,19 +6,10 @@ import (
 )
 
 // compare returns an integer with 3 possible values, -1, 0, +1
-func compare(ver1, ver2 string) (int, error) {
-	p1, err := parseSemver(ver1)
-	if err != nil {
-		return 0, err
-	}
-	p2, err := parseSemver(ver2)
-	if err != nil {
-		return 0, err
-	}
-
+func compare(c1, c2 *SemVer) (int, error) {
 	// compare major version
-	if p1.major != p2.major {
-		if p1.major > p2.major {
+	if c1.major != c2.major {
+		if c1.major > c2.major {
 			return 1, nil
 		} else {
 			return -1, nil
@@ -26,8 +17,8 @@ func compare(ver1, ver2 string) (int, error) {
 	}
 
 	// compare minor version
-	if p1.minor != p2.minor {
-		if p1.minor > p2.minor {
+	if c1.minor != c2.minor {
+		if c1.minor > c2.minor {
 			return 1, nil
 		} else {
 			return -1, nil
@@ -35,14 +26,14 @@ func compare(ver1, ver2 string) (int, error) {
 	}
 
 	// compare patch version
-	if p1.patch != p2.patch {
-		if p1.patch > p2.patch {
+	if c1.patch != c2.patch {
+		if c1.patch > c2.patch {
 			return 1, nil
 		} else {
 			return -1, nil
 		}
 	}
-	return comparePreRelease(p1.preRelease, p2.preRelease)
+	return comparePreRelease(c1.preRelease, c2.preRelease)
 }
 
 func comparePreRelease(v1, v2 string) (int, error) {

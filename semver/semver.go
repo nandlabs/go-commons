@@ -20,65 +20,88 @@ type SemVer struct {
 	build      string
 }
 
-func ParseSemver(input string) (SemVer, error) {
-	parsed, err := parseSemver(input)
+func (s *SemVer) String() string {
+	if s.preRelease != "" && s.build != "" {
+		return fmt.Sprintf("%d.%d.%d-%s+%s", s.major, s.minor, s.patch, s.preRelease, s.build)
+	} else if s.preRelease != "" {
+		return fmt.Sprintf("%d.%d.%d-%s", s.major, s.minor, s.patch, s.preRelease)
+	} else if s.build != "" {
+		return fmt.Sprintf("%d.%d.%d+%s", s.major, s.minor, s.patch, s.build)
+	}
+	return fmt.Sprintf("%d.%d.%d", s.major, s.minor, s.patch)
+}
+
+func Parse(input string) (*SemVer, error) {
+	parsed, err := parse(input)
 	return parsed, err
 }
 
-// CompareSemver returns three values -1, 0, +1
+// CompareRaw returns three values -1, 0, +1
 // -1 denotes ver1 < ver2
 // 0 denotes invalid input
 // +1 denotes ver1 > ver2
-func CompareSemver(ver1, ver2 string) (int, error) {
-	ok, err := compare(ver1, ver2)
+func CompareRaw(ver1, ver2 string) (int, error) {
+	c1, err := Parse(ver1)
+	if err != nil {
+		return 0, err
+	}
+	c2, err := Parse(ver2)
+	if err != nil {
+		return 0, err
+	}
+	ok, err := compare(c1, c2)
 	return ok, err
 }
 
-func GetNextMajor(version string) (string, error) {
-	parsed, err := parseSemver(version)
-	if err != nil {
-		return "", err
-	}
-	major := parsed.major
+// Compare returns three values -1, 0, +1
+// -1 denotes ver1 < ver2
+// 0 denotes invalid input
+// +1 denotes ver1 > ver2
+func (s *SemVer) Compare(v *SemVer) (int, error) {
+	ok, err := compare(s, v)
+	return ok, err
+}
+
+func (s *SemVer) GetNextMajor() string {
+	major := s.major
 	// increment the major version and reset minor and patch to 0
 	major++
-	return fmt.Sprintf("%d.0.0", major), nil
+	s.major = major
+	s.minor = 0
+	s.patch = 0
+	return s.String()
 }
 
-func GetNextMinor(version string) (string, error) {
-	parsed, err := parseSemver(version)
-	if err != nil {
-		return "", err
-	}
-	minor := parsed.minor
+func (s *SemVer) GetNextMinor() string {
+	minor := s.minor
 	// increment the minor version and reset patch to 0
 	minor++
-	return fmt.Sprintf("%d.%d.0", parsed.major, minor), nil
+	s.minor = minor
+	s.patch = 0
+	return s.String()
 }
 
-func GetNextPatch(version string) (string, error) {
-	parsed, err := parseSemver(version)
-	if err != nil {
-		return "", err
-	}
-	patch := parsed.patch
+func (s *SemVer) GetNextPatch() string {
+	patch := s.patch
 	// increment the patch version
 	patch++
-	return fmt.Sprintf("%d.%d.%d", parsed.major, parsed.minor, patch), nil
+	s.patch = patch
+	return s.String()
 }
 
-func IsPreRelease(input string) (bool, error) {
+func (s *SemVer) IsPreRelease() (bool, error) {
+	input := s.String()
 	input = strings.TrimPrefix(input, "v")
 	input = strings.TrimPrefix(input, " ")
 	semverRegex := regexp.MustCompile(RegexPreRelease)
 	match := semverRegex.FindStringSubmatch(input)
 	if match == nil {
-		return false, fmt.Errorf("invalid semantic version string")
+		return false, fmt.Errorf("provided version not a pre-release")
 	}
 	return true, nil
 }
 
-func parseSemver(version string) (SemVer, error) {
+func parse(version string) (*SemVer, error) {
 
 	version = strings.TrimPrefix(version, "v")
 	version = strings.TrimPrefix(version, " ")
@@ -86,28 +109,28 @@ func parseSemver(version string) (SemVer, error) {
 	semverRegex := regexp.MustCompile(RegexSemver)
 	match := semverRegex.FindStringSubmatch(version)
 	if match == nil {
-		return SemVer{}, fmt.Errorf("invalid semantic version string")
+		return &SemVer{}, fmt.Errorf("invalid semantic version string")
 	}
 
 	major, err := strconv.Atoi(match[1])
 	if err != nil {
-		return SemVer{}, err
+		return &SemVer{}, err
 	}
 
 	minor, err := strconv.Atoi(match[2])
 	if err != nil {
-		return SemVer{}, err
+		return &SemVer{}, err
 	}
 
 	patch, err := strconv.Atoi(match[3])
 	if err != nil {
-		return SemVer{}, err
+		return &SemVer{}, err
 	}
 
 	preRelease := match[5]
 	build := match[8]
 
-	return SemVer{
+	return &SemVer{
 		major:      major,
 		minor:      minor,
 		patch:      patch,
