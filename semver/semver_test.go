@@ -332,7 +332,7 @@ func TestIsPreRelease(t *testing.T) {
 			if err != nil {
 				t.Errorf("Error :: got %t, expected %t", err, tt.want)
 			}
-			got, _ := ver.IsPreRelease()
+			got := ver.IsPreRelease()
 			if tt.want != got {
 				t.Errorf("Error in testing IsPreRelease :: got %t, want %t", got, tt.want)
 			}

@@ -89,16 +89,16 @@ func (s *SemVer) GetNextPatch() string {
 	return s.String()
 }
 
-func (s *SemVer) IsPreRelease() (bool, error) {
+func (s *SemVer) IsPreRelease() bool {
 	input := s.String()
 	input = strings.TrimPrefix(input, "v")
 	input = strings.TrimPrefix(input, " ")
 	semverRegex := regexp.MustCompile(RegexPreRelease)
 	match := semverRegex.FindStringSubmatch(input)
 	if match == nil {
-		return false, fmt.Errorf("provided version not a pre-release")
+		return false
 	}
-	return true, nil
+	return true
 }
 
 func parse(version string) (*SemVer, error) {
