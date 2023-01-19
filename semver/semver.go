@@ -62,31 +62,29 @@ func (s *SemVer) Compare(v *SemVer) (int, error) {
 	return ok, err
 }
 
-func (s *SemVer) GetNextMajor() string {
-	major := s.major
-	// increment the major version and reset minor and patch to 0
-	major++
-	s.major = major
+func (s *SemVer) NextMajor() *SemVer {
+	s.major = s.major + 1
 	s.minor = 0
 	s.patch = 0
-	return s.String()
+	return s
 }
 
-func (s *SemVer) GetNextMinor() string {
-	minor := s.minor
-	// increment the minor version and reset patch to 0
-	minor++
-	s.minor = minor
+func (s *SemVer) NextMinor() *SemVer {
+
+	s.minor = s.minor + 1
 	s.patch = 0
-	return s.String()
+	return s
 }
 
-func (s *SemVer) GetNextPatch() string {
-	patch := s.patch
-	// increment the patch version
-	patch++
-	s.patch = patch
-	return s.String()
+func (s *SemVer) NextPatch() *SemVer {
+
+	s.patch = s.patch + 1
+	return s
+}
+
+func (s *SemVer) PreRelease(tag string) *SemVer {
+	s.preRelease = tag
+	return s
 }
 
 func (s *SemVer) IsPreRelease() bool {

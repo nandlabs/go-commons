@@ -203,7 +203,7 @@ func TestCompare(t *testing.T) {
 	}
 }
 
-func TestGetNextMajor(t *testing.T) {
+func TestNextMajor(t *testing.T) {
 	tests := []struct {
 		name    string
 		version string
@@ -229,7 +229,7 @@ func TestGetNextMajor(t *testing.T) {
 					t.Errorf("Error :: got %t, expected %t", err, tt.want)
 				}
 			} else {
-				got := ver.GetNextMajor()
+				got := ver.NextMajor().String()
 				if got != tt.want {
 					t.Errorf("invalid next major :: got %v, want %v", got, tt.want)
 				}
@@ -238,7 +238,7 @@ func TestGetNextMajor(t *testing.T) {
 	}
 }
 
-func TestGetNextMinor(t *testing.T) {
+func TestNextMinor(t *testing.T) {
 	tests := []struct {
 		name    string
 		version string
@@ -264,7 +264,7 @@ func TestGetNextMinor(t *testing.T) {
 					t.Errorf("Error :: got %t, expected %t", err, tt.want)
 				}
 			} else {
-				got := ver.GetNextMinor()
+				got := ver.NextMinor().String()
 				if got != tt.want {
 					t.Errorf("invalid next minor :: got %v, want %v", got, tt.want)
 				}
@@ -273,7 +273,7 @@ func TestGetNextMinor(t *testing.T) {
 	}
 }
 
-func TestGetNextPatch(t *testing.T) {
+func TestNextPatch(t *testing.T) {
 	tests := []struct {
 		name    string
 		version string
@@ -299,7 +299,7 @@ func TestGetNextPatch(t *testing.T) {
 					t.Errorf("Error :: got %t, expected %t", err, tt.want)
 				}
 			} else {
-				got := ver.GetNextPatch()
+				got := ver.NextPatch().String()
 				if got != tt.want {
 					t.Errorf("invalid next patch :: got %v, want %v", got, tt.want)
 				}
@@ -352,6 +352,23 @@ func TestString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		got := tt.version.String()
+		if got != tt.want {
+			t.Errorf("Invalid output :: want %+v, got :: %+v", tt.want, got)
+		}
+	}
+}
+
+func TestSemVer_PreRelease(t *testing.T) {
+	tests := []struct {
+		version *SemVer
+		tag     string
+		want    string
+	}{
+		{&SemVer{major: 1, minor: 2, patch: 3, preRelease: "", build: "SNAPSHOT"}, "pre01", "1.2.3-pre01+SNAPSHOT"},
+		{&SemVer{major: 1, minor: 2, patch: 3, preRelease: "rc.1", build: "SNAPSHOT"}, "pre02", "1.2.3-pre02+SNAPSHOT"},
+	}
+	for _, tt := range tests {
+		got := tt.version.PreRelease(tt.tag).String()
 		if got != tt.want {
 			t.Errorf("Invalid output :: want %+v, got :: %+v", tt.want, got)
 		}
