@@ -26,7 +26,6 @@ var helpCommand = &Command{
 	Usage:     "Shows a list of commands or help for one command",
 	ArgsUsage: "[command]",
 	Action: func(conTxt *Context) error {
-		fmt.Println("invoking help action")
 		args := conTxt.Args()
 		argsPresent := args.First() != ""
 		firstArg := args.First()
@@ -48,12 +47,13 @@ var helpCommand = &Command{
 	},
 }
 
-func isHelp(arg string) bool {
+func isHelp(conTxt *Context, inputArgs []string) bool {
 	found := false
-	for _, name := range HelpFlags {
-		if arg == name {
-			found = true
-		}
+	if len(inputArgs) == 0 {
+		return false
+	}
+	if conTxt.flagsSet.Lookup(inputArgs[0]) != nil {
+		found = true
 	}
 	return found
 }
@@ -108,6 +108,7 @@ func printCustomHelp(out io.Writer, templ string, data interface{}, customFuncs 
 	t.New("helpNameTemplate").Parse(helpNameTemplate)
 	t.New("usageTemplate").Parse(usageTemplate)
 	t.New("descriptionTemplate").Parse(descriptionTemplate)
+	t.New("visibleCommandTemplate").Parse(visibleCommandTemplate)
 
 	err := t.Execute(w, data)
 	if err != nil {

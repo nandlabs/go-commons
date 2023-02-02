@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"flag"
 )
 
@@ -10,29 +11,45 @@ type Command struct {
 	ArgsUsage string
 	Aliases   []string
 	Action    ActionFunc
-	Flags     []Flag
+	Flags     []*FlagBase
 	Commands  []*Command
 }
 
 func (command *Command) Run(conTxt *Context, arguments ...string) error {
 	a := args(arguments)
-	set, err := command.parseFlags(&a, conTxt)
+	inputArgs := a.FetchArgs()
+	if len(inputArgs) > 2 {
+		return errors.New("multiple args not supported")
+	}
+	set, err := command.parseArgs()
+	if err != nil {
+		return err
+	}
 	conTxt.flagsSet = set
 
-	//if isHelp(a[1]) {
-	//	return helpCommand.Action(conTxt)
-	//}
+	if isHelp(conTxt, inputArgs) {
+		return helpCommand.Action(conTxt)
+	}
 
 	if command.Action == nil {
 		command.Action = helpCommand.Action
 	}
 
-	//err = command.Action(conTxt)
-	err = helpCommand.Action(conTxt)
+	if len(inputArgs) > 0 {
+		currentCommand, err := command.GetCommand(inputArgs[0])
+		if err != nil {
+			command.Action = helpCommand.Action
+			return err
+		} else {
+			command.Action = currentCommand.Action
+		}
+	}
+
+	err = command.Action(conTxt)
 	return err
 }
 
-func (command *Command) parseFlags(args Args, conTxt *Context) (*flag.FlagSet, error) {
+func (command *Command) parseArgs() (*flag.FlagSet, error) {
 	set, err := command.newFlagSet()
 	if err != nil {
 		return nil, err
@@ -44,16 +61,39 @@ func (command *Command) newFlagSet() (*flag.FlagSet, error) {
 	return flagSet(command.Name, command.allFlags())
 }
 
-func (command *Command) allFlags() []Flag {
-	var flags []Flag
+func (command *Command) allFlags() []*FlagBase {
+	var flags []*FlagBase
 	flags = append(flags, command.Flags...)
 	return flags
 }
 
 func (command *Command) HasName(name string) bool {
+	for _, n := range command.Names() {
+		if n == name {
+			return true
+		}
+	}
 	return false
 }
 
 func (command *Command) Names() []string {
 	return append([]string{command.Name}, command.Aliases...)
+}
+
+func hasCommand(commands []*Command, command *Command) bool {
+	for _, exist := range commands {
+		if command == exist {
+			return true
+		}
+	}
+	return false
+}
+
+func (command *Command) GetCommand(arg string) (*Command, error) {
+	for _, c := range command.Commands {
+		if c.Name == arg {
+			return c, nil
+		}
+	}
+	return nil, errors.New("no command present")
 }

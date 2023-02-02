@@ -8,18 +8,22 @@ import (
 )
 
 type App struct {
-	Name      string
-	Usage     string
-	HelpName  string
-	ArgsUsage string
-	UsageText string
-	Action    ActionFunc
-	Flags     []Flag
-	Commands  []*Command
-	Writer    io.Writer
-
-	setupComplete bool
-	rootCommand   *Command
+	Name            string
+	Usage           string
+	HelpName        string
+	ArgsUsage       string
+	UsageText       string
+	Version         string
+	HideVersion     bool
+	Action          ActionFunc
+	Flags           []*FlagBase
+	Commands        []*Command
+	Writer          io.Writer
+	HideHelp        bool
+	HideHelpCommand bool
+	CommandVisible  bool
+	setupComplete   bool
+	rootCommand     *Command
 }
 
 func (app *App) init() {
@@ -39,6 +43,29 @@ func (app *App) init() {
 
 	if app.Usage == "" {
 		app.Usage = "CLI App 101"
+	}
+
+	if app.Version == "" {
+		app.HideVersion = true
+	}
+
+	var newCommands []*Command
+	for _, c := range app.Commands {
+		newCommands = append(newCommands, c)
+	}
+	app.Commands = newCommands
+
+	if app.Command(helpCommand.Name) == nil && !app.HideHelp {
+		if !app.HideHelpCommand {
+			app.appendCommand(helpCommand)
+		}
+		if HelpFlag != nil {
+			app.appendFlag(HelpFlag)
+		}
+	}
+
+	if len(app.Commands) > 0 {
+		app.CommandVisible = true
 	}
 
 	if app.Action == nil {
@@ -78,4 +105,29 @@ func (app *App) newRootCommand() *Command {
 
 func (app *App) writer() io.Writer {
 	return app.Writer
+}
+
+func (app *App) Command(name string) *Command {
+	for _, c := range app.Commands {
+		if c.HasName(name) {
+			return c
+		}
+	}
+	return nil
+}
+
+func (app *App) appendCommand(c *Command) {
+	if !hasCommand(app.Commands, c) {
+		app.Commands = append(app.Commands, c)
+	}
+}
+
+func (app *App) appendFlag(flag *FlagBase) {
+	if !hasFlag(app.Flags, flag) {
+		app.Flags = append(app.Flags, flag)
+	}
+}
+
+func (app *App) VisibleCommands() []*Command {
+	return app.Commands
 }

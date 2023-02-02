@@ -7,13 +7,22 @@ import (
 	"os"
 )
 
+func init() {
+}
+
 func main() {
 	app := &cli.App{
-		Name:  "dummy",
-		Usage: "dummy app for cli",
-		Action: func(ctx *cli.Context) error {
-			fmt.Println("dummy world")
-			return nil
+		Version: "v0.0.1",
+		Commands: []*cli.Command{
+			{
+				Name:    "test",
+				Usage:   "this is a test command",
+				Aliases: []string{"t"},
+				Action: func(ctx *cli.Context) error {
+					fmt.Println("hello from test command")
+					return nil
+				},
+			},
 		},
 	}
 
