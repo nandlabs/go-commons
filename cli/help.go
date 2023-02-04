@@ -65,10 +65,8 @@ func ShowCommandHelp(conTxt *Context, command string) error {
 	}
 	for _, c := range commands {
 		if c.HasName(command) {
-			template := CommandHelpTemplate
-
-			PrintHelp(conTxt.App.writer(), template, c)
-
+			helpTemplate := CommandHelpTemplate
+			PrintHelp(conTxt.App.writer(), helpTemplate, c)
 			return nil
 		}
 	}

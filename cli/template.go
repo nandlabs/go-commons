@@ -27,10 +27,11 @@ var AppHelpTemplate = `NAME:
    {{template "helpNameTemplate" .}}
 
 USAGE:
-   {{if .UsageText}}{{wrap .UsageText 3}}{{else}}{{.HelpName}} [global options]{{if .Commands}} command [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}
-{{if .CommandVisible}}
-COMMANDS:{{template "visibleCommandTemplate" .}}{{end}}
-{{if .Version}}{{if not .HideVersion}}
+   {{template "usageTemplate" .}}{{if .CommandVisible}}
+
+COMMANDS:
+	{{template "visibleCommandTemplate" .}}{{end}}{{if .Version}}{{if not .HideVersion}}
+
 VERSION:
    {{.Version}}{{end}}{{end}}
 `

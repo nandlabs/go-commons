@@ -23,6 +23,15 @@ func main() {
 					return nil
 				},
 			},
+			{
+				Name:    "run",
+				Usage:   "time to run",
+				Aliases: []string{"r"},
+				Action: func(ctx *cli.Context) error {
+					fmt.Println("time to run away")
+					return nil
+				},
+			},
 		},
 	}
 

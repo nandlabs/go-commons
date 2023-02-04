@@ -8,15 +8,20 @@ import (
 )
 
 type App struct {
-	Name            string
-	Usage           string
-	HelpName        string
-	ArgsUsage       string
-	UsageText       string
-	Version         string
-	HideVersion     bool
-	Action          ActionFunc
-	Flags           []*FlagBase
+	// application name
+	Name string
+	// application usage information
+	Usage string
+	//
+	HelpName    string
+	ArgsUsage   string
+	UsageText   string
+	Version     string
+	HideVersion bool
+	// the function to be invoked on the default execution
+	Action ActionFunc
+	Flags  []*FlagBase
+	// application commands
 	Commands        []*Command
 	Writer          io.Writer
 	HideHelp        bool
@@ -26,7 +31,7 @@ type App struct {
 	rootCommand     *Command
 }
 
-func (app *App) init() {
+func (app *App) initialize() {
 	if app.setupComplete {
 		return
 	}
@@ -82,7 +87,7 @@ func (app *App) Execute(arguments []string) error {
 }
 
 func (app *App) ExecuteContext(ctx context.Context, arguments []string) error {
-	app.init()
+	app.initialize()
 
 	conTxt := NewContext(app, &Context{Context: ctx})
 

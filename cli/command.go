@@ -6,13 +6,18 @@ import (
 )
 
 type Command struct {
-	Name      string
+	// command name used to invoke from CLI
+	Name string
+	// command usage information
 	Usage     string
 	ArgsUsage string
-	Aliases   []string
-	Action    ActionFunc
-	Flags     []*FlagBase
-	Commands  []*Command
+	// the array of aliases to invoke the commands
+	Aliases []string
+	// execute on the command invocation
+	Action ActionFunc
+	Flags  []*FlagBase
+	// subcommands of the root command
+	Commands []*Command
 }
 
 func (command *Command) Run(conTxt *Context, arguments ...string) error {
@@ -38,8 +43,8 @@ func (command *Command) Run(conTxt *Context, arguments ...string) error {
 	if len(inputArgs) > 0 {
 		currentCommand, err := command.GetCommand(inputArgs[0])
 		if err != nil {
+			logger.Error(err)
 			command.Action = helpCommand.Action
-			return err
 		} else {
 			command.Action = currentCommand.Action
 		}
@@ -91,9 +96,19 @@ func hasCommand(commands []*Command, command *Command) bool {
 
 func (command *Command) GetCommand(arg string) (*Command, error) {
 	for _, c := range command.Commands {
-		if c.Name == arg {
+		// TODO : logic can be improved
+		if c.Name == arg || c.checkForAlias(arg) {
 			return c, nil
 		}
 	}
 	return nil, errors.New("no command present")
+}
+
+func (command *Command) checkForAlias(arg string) bool {
+	for _, a := range command.Aliases {
+		if arg == a {
+			return true
+		}
+	}
+	return false
 }
