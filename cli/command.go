@@ -32,7 +32,7 @@ func (command *Command) Run(conTxt *Context, arguments ...string) error {
 	}
 	conTxt.flagsSet = set
 
-	if isHelp(conTxt, inputArgs) {
+	if checkForAppHelp(conTxt, inputArgs) {
 		return helpCommand.Action(conTxt)
 	}
 
@@ -41,13 +41,11 @@ func (command *Command) Run(conTxt *Context, arguments ...string) error {
 	}
 
 	if len(inputArgs) > 0 {
-		currentCommand, err := command.GetCommand(inputArgs[0])
-		if err != nil {
-			logger.Error(err)
-			command.Action = helpCommand.Action
-		} else {
-			command.Action = currentCommand.Action
+		commandFound := command.findCommandPath(inputArgs)
+		if commandFound == nil {
+			return errors.New("command not found")
 		}
+		command.Action = commandFound.Action
 	}
 
 	err = command.Action(conTxt)
@@ -92,6 +90,33 @@ func hasCommand(commands []*Command, command *Command) bool {
 		}
 	}
 	return false
+}
+
+func (command *Command) findCommandPath(args []string) *Command {
+	for _, c := range command.Commands {
+		found := search(c, args)
+		if found != nil {
+			return found
+		}
+	}
+	return nil
+}
+
+func search(command *Command, args []string) *Command {
+	if command == nil {
+		return nil
+	}
+	if command.Name == args[0] {
+		if len(args) == 1 {
+			return command
+		}
+		for _, child := range command.Commands {
+			if search(child, args[1:]) != nil {
+				return child
+			}
+		}
+	}
+	return nil
 }
 
 func (command *Command) GetCommand(arg string) (*Command, error) {

@@ -22,13 +22,14 @@ type App struct {
 	Action ActionFunc
 	Flags  []*FlagBase
 	// application commands
-	Commands        []*Command
-	Writer          io.Writer
-	HideHelp        bool
-	HideHelpCommand bool
-	CommandVisible  bool
-	setupComplete   bool
-	rootCommand     *Command
+	Commands             []*Command
+	Writer               io.Writer
+	HideHelp             bool
+	HideHelpCommand      bool
+	CommandVisible       bool
+	setupComplete        bool
+	subCommandsAvailable bool
+	rootCommand          *Command
 }
 
 func (app *App) initialize() {
@@ -56,6 +57,9 @@ func (app *App) initialize() {
 
 	var newCommands []*Command
 	for _, c := range app.Commands {
+		if len(c.Commands) > 0 {
+			app.subCommandsAvailable = true
+		}
 		newCommands = append(newCommands, c)
 	}
 	app.Commands = newCommands

@@ -35,6 +35,7 @@ var helpCommand = &Command{
 		}
 
 		if argsPresent {
+			fmt.Println("command help")
 			return ShowCommandHelp(conTxt, firstArg)
 		}
 
@@ -47,7 +48,7 @@ var helpCommand = &Command{
 	},
 }
 
-func isHelp(conTxt *Context, inputArgs []string) bool {
+func checkForAppHelp(conTxt *Context, inputArgs []string) bool {
 	found := false
 	if len(inputArgs) == 0 {
 		return false

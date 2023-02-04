@@ -31,6 +31,24 @@ func main() {
 					fmt.Println("time to run away")
 					return nil
 				},
+				Commands: []*cli.Command{
+					{
+						Name:  "slow",
+						Usage: "run slow",
+						Action: func(ctx *cli.Context) error {
+							fmt.Println("time to run slow")
+							return nil
+						},
+					},
+					{
+						Name:  "fast",
+						Usage: "run fast",
+						Action: func(ctx *cli.Context) error {
+							fmt.Println("time to run fast")
+							return nil
+						},
+					},
+				},
 			},
 		},
 	}
