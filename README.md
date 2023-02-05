@@ -25,3 +25,8 @@ go get go.nandlabs.io/commons
 ## WIP
 
 * [Secrets Management](secrets/README.md)
+
+### Contributing
+
+We welcome contributions to the project. If you find a bug or would like to request a new feature, please open an issue 
+on [GitHub](https://github.com/nandlabs/go-commons/issues).
