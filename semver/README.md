@@ -20,7 +20,7 @@ go get go.nandlabs.io/commons/semver
 
 ### Features
 
-* Adheres to the SemVer 2.0.0 specification
+* Adheres to the [SemVer 2.0.0](https://semver.org/#semantic-versioning-200) specification
 * Easy to use API for parsing, comparing and generating SemVer versions
 * Supports pre-release and build metadata
 * Written in modern Golang and follows best practices
@@ -57,10 +57,4 @@ func main() {
 }
 ```
 
-### Documentation
 
-For more information on how to use the SemVer package, please refer to the [official documentation](https://semver.org/).
-
-### Contributing
-
-We welcome contributions to the SemVer package. If you find a bug or would like to request a new feature, please open an issue on [GitHub](https://github.com/nandlabs/go-commons/issues).
