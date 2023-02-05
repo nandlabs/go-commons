@@ -19,8 +19,14 @@ go get go.nandlabs.io/commons
 * [Lightweight Levelled Logger (l3)](l3/README.md)
 * [Http Routing Capabilities  (turbo)](turbo/README.md)
 * [Virtual File System (vfs)](vfs/README.md)
+* [Semver](semver/README.md)
 
 
 ## WIP
 
 * [Secrets Management](secrets/README.md)
+
+### Contributing
+
+We welcome contributions to the project. If you find a bug or would like to request a new feature, please open an issue 
+on [GitHub](https://github.com/nandlabs/go-commons/issues).
