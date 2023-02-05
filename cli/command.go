@@ -15,7 +15,8 @@ type Command struct {
 	Aliases []string
 	// execute on the command invocation
 	Action ActionFunc
-	Flags  []*FlagBase
+	// command specific flags
+	Flags []*FlagBase
 	// subcommands of the root command
 	Commands []*Command
 }

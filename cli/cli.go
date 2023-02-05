@@ -20,16 +20,16 @@ type App struct {
 	HideVersion bool
 	// the function to be invoked on the default execution
 	Action ActionFunc
-	Flags  []*FlagBase
+	// global flags
+	Flags []*FlagBase
 	// application commands
-	Commands             []*Command
-	Writer               io.Writer
-	HideHelp             bool
-	HideHelpCommand      bool
-	CommandVisible       bool
-	setupComplete        bool
-	subCommandsAvailable bool
-	rootCommand          *Command
+	Commands        []*Command
+	Writer          io.Writer
+	HideHelp        bool
+	HideHelpCommand bool
+	CommandVisible  bool
+	setupComplete   bool
+	rootCommand     *Command
 }
 
 func (app *App) initialize() {
@@ -57,9 +57,6 @@ func (app *App) initialize() {
 
 	var newCommands []*Command
 	for _, c := range app.Commands {
-		if len(c.Commands) > 0 {
-			app.subCommandsAvailable = true
-		}
 		newCommands = append(newCommands, c)
 	}
 	app.Commands = newCommands
@@ -92,6 +89,11 @@ func (app *App) Execute(arguments []string) error {
 
 func (app *App) ExecuteContext(ctx context.Context, arguments []string) error {
 	app.initialize()
+
+	// args []
+
+	// create a map of the command [key->command_name, value->{ action: command_action, subcommands: map of commands, flags: [flag_name, flagParser] }]
+	// mandatory flags
 
 	conTxt := NewContext(app, &Context{Context: ctx})
 

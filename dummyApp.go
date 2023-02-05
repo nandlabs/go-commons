@@ -13,6 +13,10 @@ func init() {
 func main() {
 	app := &cli.App{
 		Version: "v0.0.1",
+		Action: func(ctx *cli.Context) error {
+			fmt.Printf("Hello %q", ctx.Args().Get(0))
+			return nil
+		},
 		Commands: []*cli.Command{
 			{
 				Name:    "test",

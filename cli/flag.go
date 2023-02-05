@@ -4,10 +4,14 @@ import (
 	"flag"
 )
 
+// a flag will always be rpefixed with -- (name) or - (alias)
 type FlagBase struct {
 	Name    string
 	Usage   string
 	Aliases []string
+	// default value of the flag
+	Default interface{}
+	Var     any // pointer
 }
 
 var HelpFlag = &FlagBase{

@@ -33,7 +33,7 @@ var helpCommand = &Command{
 		if conTxt.Command.Name == "help" || conTxt.Command.Name == "h" {
 			conTxt = conTxt.parentContext
 		}
-
+		fmt.Println(argsPresent)
 		if argsPresent {
 			fmt.Println("command help")
 			return ShowCommandHelp(conTxt, firstArg)
