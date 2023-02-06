@@ -2,7 +2,6 @@ package rest
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -172,8 +171,6 @@ func (r *Request) toHttpRequest() (httpReq *http.Request, err error) {
 			pathValues := strings.Split(u.Path, textutils.ForwardSlashStr)
 			for i := range pathValues {
 				l := len(pathValues[i])
-				fmt.Println(i)
-				fmt.Println(pathValues[i])
 				if l > 3 && strings.HasPrefix(pathValues[i], pathParamPrefix) &&
 					strings.HasSuffix(pathValues[i], pathParamSuffix) {
 					key := pathValues[i][2 : l-1]
