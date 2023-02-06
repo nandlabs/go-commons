@@ -3,6 +3,7 @@ package cli
 import (
 	"errors"
 	"flag"
+	"fmt"
 )
 
 type Command struct {
@@ -24,29 +25,26 @@ type Command struct {
 func (command *Command) Run(conTxt *Context, arguments ...string) error {
 	a := args(arguments)
 	inputArgs := a.FetchArgs()
-	if len(inputArgs) > 2 {
-		return errors.New("multiple args not supported")
-	}
 	set, err := command.parseArgs()
 	if err != nil {
 		return err
 	}
 	conTxt.flagsSet = set
 
-	if checkForAppHelp(conTxt, inputArgs) {
+	if checkHelpFlag(conTxt, inputArgs) {
 		return helpCommand.Action(conTxt)
 	}
 
-	if command.Action == nil {
-		command.Action = helpCommand.Action
-	}
-
 	if len(inputArgs) > 0 {
-		commandFound := command.findCommandPath(inputArgs)
+		commandFound := command.findCommandPath(conTxt, inputArgs)
 		if commandFound == nil {
 			return errors.New("command not found")
 		}
 		command.Action = commandFound.Action
+	}
+
+	if command.Action == nil {
+		command.Action = helpCommand.Action
 	}
 
 	err = command.Action(conTxt)
@@ -93,9 +91,9 @@ func hasCommand(commands []*Command, command *Command) bool {
 	return false
 }
 
-func (command *Command) findCommandPath(args []string) *Command {
+func (command *Command) findCommandPath(conTxt *Context, args []string) *Command {
 	for _, c := range command.Commands {
-		found := search(c, args)
+		found := search(c, conTxt, args)
 		if found != nil {
 			return found
 		}
@@ -103,7 +101,8 @@ func (command *Command) findCommandPath(args []string) *Command {
 	return nil
 }
 
-func search(command *Command, args []string) *Command {
+func search(command *Command, conTxt *Context, args []string) *Command {
+	fmt.Println(command.Name)
 	if command == nil {
 		return nil
 	}
@@ -112,22 +111,12 @@ func search(command *Command, args []string) *Command {
 			return command
 		}
 		for _, child := range command.Commands {
-			if search(child, args[1:]) != nil {
+			if search(child, conTxt, args[1:]) != nil {
 				return child
 			}
 		}
 	}
 	return nil
-}
-
-func (command *Command) GetCommand(arg string) (*Command, error) {
-	for _, c := range command.Commands {
-		// TODO : logic can be improved
-		if c.Name == arg || c.checkForAlias(arg) {
-			return c, nil
-		}
-	}
-	return nil, errors.New("no command present")
 }
 
 func (command *Command) checkForAlias(arg string) bool {

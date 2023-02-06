@@ -4,20 +4,21 @@ import (
 	"flag"
 )
 
-// a flag will always be rpefixed with -- (name) or - (alias)
+// FlagBase a flag will always be prefixed with -- (name) or - (alias)
 type FlagBase struct {
 	Name    string
 	Usage   string
 	Aliases []string
 	// default value of the flag
 	Default interface{}
-	Var     any // pointer
+	//Var     any // pointer
 }
 
+// HelpFlag built-in flag present in the system
 var HelpFlag = &FlagBase{
 	Name:    "help",
 	Usage:   "show help",
-	Aliases: []string{"h"},
+	Aliases: []string{"-h", "--help"},
 }
 
 //type Flag interface {
@@ -50,6 +51,10 @@ func hasFlag(flags []*FlagBase, flag *FlagBase) bool {
 }
 
 func (flag *FlagBase) Apply(flagSet *flag.FlagSet) error {
-	flagSet.String(flag.Name, "", flag.Usage)
+	if flag.Name == "help" {
+		for _, fl := range flag.Aliases {
+			flagSet.Bool(fl, true, flag.Usage)
+		}
+	}
 	return nil
 }

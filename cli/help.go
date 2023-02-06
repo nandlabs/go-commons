@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	HelpFlags = [2]string{"help", "h"}
+	HelpFlags = [2]string{"--help", "-h"}
 )
 
 var PrintHelp helpPrinter = printHelp
@@ -33,7 +33,6 @@ var helpCommand = &Command{
 		if conTxt.Command.Name == "help" || conTxt.Command.Name == "h" {
 			conTxt = conTxt.parentContext
 		}
-		fmt.Println(argsPresent)
 		if argsPresent {
 			fmt.Println("command help")
 			return ShowCommandHelp(conTxt, firstArg)
@@ -48,7 +47,7 @@ var helpCommand = &Command{
 	},
 }
 
-func checkForAppHelp(conTxt *Context, inputArgs []string) bool {
+func checkHelpFlag(conTxt *Context, inputArgs []string) bool {
 	found := false
 	if len(inputArgs) == 0 {
 		return false

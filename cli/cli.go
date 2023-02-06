@@ -62,9 +62,6 @@ func (app *App) initialize() {
 	app.Commands = newCommands
 
 	if app.Command(helpCommand.Name) == nil && !app.HideHelp {
-		if !app.HideHelpCommand {
-			app.appendCommand(helpCommand)
-		}
 		if HelpFlag != nil {
 			app.appendFlag(HelpFlag)
 		}
