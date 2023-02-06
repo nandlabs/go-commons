@@ -2,6 +2,7 @@ package rest
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -83,6 +84,16 @@ func (r *Request) AddQueryParam(k string, v ...string) *Request {
 	return r
 }
 
+//AddPathParam function adds the path parameter with key as the name of the parameter and v as the value of the parameter
+//that needs to be replaced
+func (r *Request) AddPathParam(k string, v string) *Request {
+	if r.pathParams == nil {
+		r.pathParams = make(map[string]string)
+	}
+	r.pathParams[k] = v
+	return r
+}
+
 func (r *Request) AddHeader(k string, v ...string) *Request {
 	mh := textproto.MIMEHeader(r.header)
 	for i, s := range v {
@@ -161,9 +172,11 @@ func (r *Request) toHttpRequest() (httpReq *http.Request, err error) {
 			pathValues := strings.Split(u.Path, textutils.ForwardSlashStr)
 			for i := range pathValues {
 				l := len(pathValues[i])
+				fmt.Println(i)
+				fmt.Println(pathValues[i])
 				if l > 3 && strings.HasPrefix(pathValues[i], pathParamPrefix) &&
-					strings.HasSuffix(pathValues[l-1], pathParamSuffix) {
-					key := pathValues[i][2:l]
+					strings.HasSuffix(pathValues[i], pathParamSuffix) {
+					key := pathValues[i][2 : l-1]
 					if v, ok := r.pathParams[key]; ok {
 						pathValues[i] = v
 					} else {
