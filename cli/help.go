@@ -22,7 +22,7 @@ type helpCustomPrinter func(w io.Writer, template string, data interface{}, cust
 
 var helpCommand = &Command{
 	Name:      "help",
-	Aliases:   []string{"h"},
+	Aliases:   []string{"-h", "--help"},
 	Usage:     "Shows a list of commands or help for one command",
 	ArgsUsage: "[command]",
 	Action: func(conTxt *Context) error {
