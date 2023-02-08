@@ -1,5 +1,7 @@
 package cli
 
+import "strings"
+
 type Args interface {
 	Get(n int) string
 	First() string
@@ -20,9 +22,22 @@ func (a *args) First() string {
 }
 
 func (a *args) FetchArgs() []string {
+	var outputArgs []string
+	var tail []string
 	if len(*a) >= 2 {
-		tail := []string((*a)[1:])
-		return tail
+		tail = (*a)[1:]
 	}
-	return []string{}
+	for _, item := range tail {
+		if !isFlag(item) {
+			outputArgs = append(outputArgs, item)
+		}
+	}
+	return outputArgs
+}
+
+func isFlag(item string) bool {
+	if strings.HasPrefix(item, "-") || strings.HasPrefix(item, "--") {
+		return true
+	}
+	return false
 }

@@ -2,6 +2,11 @@ package cli
 
 import (
 	"flag"
+	"fmt"
+)
+
+var (
+	mappedFlags = make(map[string]interface{})
 )
 
 // FlagBase a flag will always be prefixed with -- (name) or - (alias)
@@ -19,26 +24,7 @@ var HelpFlag = &FlagBase{
 	Name:    "help",
 	Usage:   "show help",
 	Aliases: []string{"-h", "--help"},
-}
-
-//type Flag interface {
-//	fmt.Stringer
-//
-//	Apply(*flag.FlagSet) error
-//
-//	Names() []string
-//
-//	IsSet() bool
-//}
-
-func flagSet(name string, flags []*FlagBase) (*flag.FlagSet, error) {
-	set := flag.NewFlagSet(name, flag.ContinueOnError)
-	for _, f := range flags {
-		if err := f.Apply(set); err != nil {
-			return nil, err
-		}
-	}
-	return set, nil
+	Default: "",
 }
 
 func hasFlag(flags []*FlagBase, flag *FlagBase) bool {
@@ -50,11 +36,24 @@ func hasFlag(flags []*FlagBase, flag *FlagBase) bool {
 	return false
 }
 
-func (flag *FlagBase) Apply(flagSet *flag.FlagSet) error {
-	if flag.Name == "help" {
-		for _, fl := range flag.Aliases {
-			flagSet.Bool(fl, true, flag.Usage)
+// improve based on the type of flags
+func setFlags(name string, inputFlags []*FlagBase) {
+	//set := flag.NewFlagSet(name, flag.ContinueOnError)
+	fmt.Println(inputFlags)
+	for _, f := range inputFlags {
+		fmt.Println(f.Name)
+		if f.Name == "help" {
+			f.AddHelpFlag()
+		} else {
+			f.AddFlagToSet()
 		}
 	}
-	return nil
+}
+
+func (f *FlagBase) AddFlagToSet() {
+	flag.String(f.Name, f.Default.(string), f.Usage)
+}
+
+func (f *FlagBase) AddHelpFlag() {
+	flag.Bool(f.Name, true, f.Usage)
 }

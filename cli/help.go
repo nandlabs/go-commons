@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"strings"
@@ -52,10 +53,17 @@ func checkHelpFlag(conTxt *Context, inputArgs []string) bool {
 	if len(inputArgs) == 0 {
 		return false
 	}
-	if conTxt.flagsSet.Lookup(inputArgs[0]) != nil {
+	arg := cleanUpArg(inputArgs[0])
+	if flag.Lookup(arg) != nil {
 		found = true
 	}
 	return found
+}
+
+func cleanUpArg(input string) string {
+	output := strings.TrimPrefix(input, "--")
+	output = strings.TrimPrefix(output, "-")
+	return output
 }
 
 func ShowCommandHelp(conTxt *Context, command string) error {

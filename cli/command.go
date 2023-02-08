@@ -25,11 +25,9 @@ type Command struct {
 func (command *Command) Run(conTxt *Context, arguments ...string) error {
 	a := args(arguments)
 	inputArgs := a.FetchArgs()
-	set, err := command.parseArgs()
-	if err != nil {
-		return err
-	}
-	conTxt.flagsSet = set
+	command.addUserDefinedFlags()
+
+	parseArgs()
 
 	if checkHelpFlag(conTxt, inputArgs) {
 		return helpCommand.Action(conTxt)
@@ -47,20 +45,23 @@ func (command *Command) Run(conTxt *Context, arguments ...string) error {
 		command.Action = helpCommand.Action
 	}
 
-	err = command.Action(conTxt)
+	err := command.Action(conTxt)
 	return err
 }
 
-func (command *Command) parseArgs() (*flag.FlagSet, error) {
-	set, err := command.newFlagSet()
-	if err != nil {
-		return nil, err
-	}
-	return set, nil
-}
-
-func (command *Command) newFlagSet() (*flag.FlagSet, error) {
-	return flagSet(command.Name, command.allFlags())
+// why are we not able to get the flag value from cli?
+func parseArgs() {
+	flag.Parse()
+	flag.VisitAll(func(f *flag.Flag) {
+		fmt.Println(f.Name)
+		fmt.Println(f.Value)
+		fmt.Println(f.DefValue)
+		if f.Value != nil {
+			mappedFlags[f.Name] = f.Value
+		} else {
+			mappedFlags[f.Name] = f.DefValue
+		}
+	})
 }
 
 func (command *Command) allFlags() []*FlagBase {
@@ -102,7 +103,6 @@ func (command *Command) findCommandPath(conTxt *Context, args []string) *Command
 }
 
 func search(command *Command, conTxt *Context, args []string) *Command {
-	fmt.Println(command.Name)
 	if command == nil {
 		return nil
 	}
@@ -126,4 +126,8 @@ func (command *Command) checkForAlias(arg string) bool {
 		}
 	}
 	return false
+}
+
+func (command *Command) addUserDefinedFlags() {
+	setFlags(command.Name, command.Flags)
 }

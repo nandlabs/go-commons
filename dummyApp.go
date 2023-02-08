@@ -7,14 +7,18 @@ import (
 	"os"
 )
 
-func init() {
-}
+const (
+	ProjectDir  = "pd"
+	ProfileFile = "pf"
+)
 
 func main() {
 	app := &cli.App{
 		Version: "v0.0.1",
 		Action: func(ctx *cli.Context) error {
 			fmt.Printf("Hello %q", ctx.Args().Get(0))
+			fmt.Println(ctx.GetFlag(ProjectDir))
+			fmt.Println(ctx.GetFlag(ProfileFile))
 			return nil
 		},
 		Commands: []*cli.Command{
@@ -24,6 +28,8 @@ func main() {
 				Aliases: []string{"t"},
 				Action: func(ctx *cli.Context) error {
 					fmt.Println("hello from test command")
+					fmt.Println(ctx.GetFlag(ProjectDir))
+					fmt.Println(ctx.GetFlag(ProfileFile))
 					return nil
 				},
 			},
@@ -53,6 +59,20 @@ func main() {
 						},
 					},
 				},
+			},
+		},
+		Flags: []*cli.FlagBase{
+			{
+				Name:    ProjectDir,
+				Aliases: []string{"pd"},
+				Default: "",
+				Usage:   "Directory of the project to be built",
+			},
+			{
+				Name:    ProfileFile,
+				Aliases: []string{"pf"},
+				Default: "",
+				Usage:   "Profile file name to be used",
 			},
 		},
 	}
