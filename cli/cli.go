@@ -57,6 +57,9 @@ func (app *App) initialize() {
 
 	var newCommands []*Command
 	for _, c := range app.Commands {
+		if c.HelpName == "" {
+			c.HelpName = c.Name
+		}
 		newCommands = append(newCommands, c)
 	}
 	app.Commands = newCommands

@@ -2,7 +2,6 @@ package cli
 
 import (
 	"flag"
-	"fmt"
 )
 
 var (
@@ -39,9 +38,7 @@ func hasFlag(flags []*FlagBase, flag *FlagBase) bool {
 // improve based on the type of flags
 func setFlags(name string, inputFlags []*FlagBase) {
 	//set := flag.NewFlagSet(name, flag.ContinueOnError)
-	fmt.Println(inputFlags)
 	for _, f := range inputFlags {
-		fmt.Println(f.Name)
 		if f.Name == "help" {
 			f.AddHelpFlag()
 		} else {

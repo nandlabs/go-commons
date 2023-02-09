@@ -1,6 +1,8 @@
 package cli
 
-import "strings"
+import (
+	"strings"
+)
 
 type Args interface {
 	Get(n int) string
@@ -37,6 +39,15 @@ func (a *args) FetchArgs() []string {
 
 func isFlag(item string) bool {
 	if strings.HasPrefix(item, "-") || strings.HasPrefix(item, "--") {
+		return true
+	}
+	return false
+}
+
+func (a *args) checkForHelp() bool {
+	args := (*a)[1:]
+	lastItem := args[len(args)-1]
+	if lastItem == "-help" || lastItem == "-h" {
 		return true
 	}
 	return false

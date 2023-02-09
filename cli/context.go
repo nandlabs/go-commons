@@ -3,7 +3,6 @@ package cli
 import (
 	"context"
 	"flag"
-	"fmt"
 )
 
 type Context struct {
@@ -35,6 +34,5 @@ func (conTxt *Context) Args() Args {
 }
 
 func (conTxt *Context) GetFlag(name string) interface{} {
-	fmt.Println(mappedFlags)
 	return mappedFlags[name]
 }

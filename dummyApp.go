@@ -39,6 +39,8 @@ func main() {
 				Aliases: []string{"r"},
 				Action: func(ctx *cli.Context) error {
 					fmt.Println("time to run away")
+					fmt.Println(ctx.GetFlag(ProjectDir))
+					fmt.Println(ctx.GetFlag(ProfileFile))
 					return nil
 				},
 				Commands: []*cli.Command{
@@ -47,6 +49,8 @@ func main() {
 						Usage: "run slow",
 						Action: func(ctx *cli.Context) error {
 							fmt.Println("time to run slow")
+							fmt.Println(ctx.GetFlag(ProjectDir))
+							fmt.Println(ctx.GetFlag(ProfileFile))
 							return nil
 						},
 					},
@@ -55,6 +59,8 @@ func main() {
 						Usage: "run fast",
 						Action: func(ctx *cli.Context) error {
 							fmt.Println("time to run fast")
+							fmt.Println(ctx.GetFlag(ProjectDir))
+							fmt.Println(ctx.GetFlag(ProfileFile))
 							return nil
 						},
 					},

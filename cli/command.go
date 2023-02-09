@@ -3,7 +3,6 @@ package cli
 import (
 	"errors"
 	"flag"
-	"fmt"
 )
 
 type Command struct {
@@ -20,6 +19,7 @@ type Command struct {
 	Flags []*FlagBase
 	// subcommands of the root command
 	Commands []*Command
+	HelpName string
 }
 
 func (command *Command) Run(conTxt *Context, arguments ...string) error {
@@ -27,19 +27,27 @@ func (command *Command) Run(conTxt *Context, arguments ...string) error {
 	inputArgs := a.FetchArgs()
 	command.addUserDefinedFlags()
 
+	isHelpPresent := a.checkForHelp()
+	var finalCommand *Command
+
 	parseArgs()
 
-	if checkHelpFlag(conTxt, inputArgs) {
+	if len(inputArgs) > 0 {
+		finalCommand = command.findCommandPath(conTxt, inputArgs)
+		if finalCommand == nil {
+			return errors.New("command not found")
+		}
+		command.Action = finalCommand.Action
+	}
+
+	if isHelpPresent {
+		conTxt.Command = finalCommand
 		return helpCommand.Action(conTxt)
 	}
 
-	if len(inputArgs) > 0 {
-		commandFound := command.findCommandPath(conTxt, inputArgs)
-		if commandFound == nil {
-			return errors.New("command not found")
-		}
-		command.Action = commandFound.Action
-	}
+	//if checkHelpFlag(conTxt, inputArgs) {
+	//	return helpCommand.Action(conTxt)
+	//}
 
 	if command.Action == nil {
 		command.Action = helpCommand.Action
@@ -49,13 +57,10 @@ func (command *Command) Run(conTxt *Context, arguments ...string) error {
 	return err
 }
 
-// why are we not able to get the flag value from cli?
+// with default flag library they can be parsed if they are added before args
 func parseArgs() {
 	flag.Parse()
-	flag.VisitAll(func(f *flag.Flag) {
-		fmt.Println(f.Name)
-		fmt.Println(f.Value)
-		fmt.Println(f.DefValue)
+	flag.Visit(func(f *flag.Flag) {
 		if f.Value != nil {
 			mappedFlags[f.Name] = f.Value
 		} else {

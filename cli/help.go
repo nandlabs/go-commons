@@ -35,7 +35,6 @@ var helpCommand = &Command{
 			conTxt = conTxt.parentContext
 		}
 		if argsPresent {
-			fmt.Println("command help")
 			return ShowCommandHelp(conTxt, firstArg)
 		}
 
@@ -50,13 +49,11 @@ var helpCommand = &Command{
 
 func checkHelpFlag(conTxt *Context, inputArgs []string) bool {
 	found := false
-	if len(inputArgs) == 0 {
-		return false
-	}
-	arg := cleanUpArg(inputArgs[0])
+	arg := cleanUpArg("help")
 	if flag.Lookup(arg) != nil {
 		found = true
 	}
+	fmt.Println(found)
 	return found
 }
 
