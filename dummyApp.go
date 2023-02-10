@@ -67,6 +67,7 @@ func main() {
 				},
 			},
 		},
+		// global app flags
 		Flags: []*cli.FlagBase{
 			{
 				Name:    ProjectDir,

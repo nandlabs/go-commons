@@ -10,17 +10,10 @@ var CommandHelpTemplate = `NAME:
    {{template "helpNameTemplate" .}}
 
 USAGE:
-   {{template "usageTemplate" .}}{{if .Category}}
+   {{template "usageTemplate" .}}{{if .SubCommandsAvailable}}
 
-CATEGORY:
-   {{.Category}}{{end}}{{if .Description}}
-
-DESCRIPTION:
-   {{template "descriptionTemplate" .}}{{end}}{{if .VisibleFlagCategories}}
-
-OPTIONS:{{template "visibleFlagCategoryTemplate" .}}{{else if .VisibleFlags}}
-
-OPTIONS:{{template "visibleFlagTemplate" .}}{{end}}
+COMMANDS:
+	{{template "visibleCommandTemplate" .}}{{end}}
 `
 
 var AppHelpTemplate = `NAME:

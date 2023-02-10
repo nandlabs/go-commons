@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"strings"
@@ -35,6 +34,7 @@ var helpCommand = &Command{
 			conTxt = conTxt.parentContext
 		}
 		if argsPresent {
+			fmt.Println("args present")
 			return ShowCommandHelp(conTxt, firstArg)
 		}
 
@@ -47,33 +47,21 @@ var helpCommand = &Command{
 	},
 }
 
-func checkHelpFlag(conTxt *Context, inputArgs []string) bool {
-	found := false
-	arg := cleanUpArg("help")
-	if flag.Lookup(arg) != nil {
-		found = true
-	}
-	fmt.Println(found)
-	return found
-}
-
-func cleanUpArg(input string) string {
-	output := strings.TrimPrefix(input, "--")
-	output = strings.TrimPrefix(output, "-")
-	return output
-}
-
 func ShowCommandHelp(conTxt *Context, command string) error {
+	fmt.Println(command)
 	commands := conTxt.App.Commands
 	if conTxt.Command.Commands != nil {
 		commands = conTxt.Command.Commands
 	}
+	//fmt.Println(commands)
 	for _, c := range commands {
-		if c.HasName(command) {
-			helpTemplate := CommandHelpTemplate
-			PrintHelp(conTxt.App.writer(), helpTemplate, c)
-			return nil
-		}
+		fmt.Println(c.Name)
+		//if c.HasName(command) {
+		//	fmt.Println("got")
+		//	helpTemplate := CommandHelpTemplate
+		//	PrintHelp(conTxt.App.writer(), helpTemplate, c)
+		//	return nil
+		//}
 	}
 
 	// add check for the command not found

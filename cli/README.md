@@ -6,6 +6,9 @@ This project is a Go library for building powerful and user-friendly command-lin
 - [Installation](#installation)
 - [Features](#features)
 - [Usage](#usage)
+  - [Default Usage](#default)
+  - [Subcommand Usage](#subcommands)
+  - [Flags Usage](#flags)
 ---
 
 ### Installation
@@ -23,36 +26,231 @@ go get go.nandlabs.io/commons/cli
 
 ### Usage
 
+#### Default
 ```go
 package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
-	cli "go.nandlabs.io/commons/cli"
+	"go.nandlabs.io/commons/cli"
 )
 
 func main() {
-	app := cli.NewApp("my-cli")
-	app.Usage = "A simple CLI for demonstration purposes"
+	app := &cli.App{
+		Version: "v0.0.1",
+		Action: func(ctx *cli.Context) error {
+			fmt.Printf("Hello, Golang!")
+			return nil
+		},
+	}
 
-	app.Commands = []cli.Command{
-		{
-			Name:    "greet",
-			Aliases: []string{"g"},
-			Usage:   "Greet the user",
-			Action: func(c *cli.Context) error {
-				fmt.Println("Hello, world!")
-				return nil
+	if err := app.Execute(os.Args); err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+CLI Command and Output
+```shell
+~ % go run main.go greet
+Hello, Golang!
+```
+
+#### Subcommands
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+
+	"go.nandlabs.io/commons/cli"
+)
+
+func main() {
+	app := &cli.App{
+		Version: "v0.0.1",
+		Action: func(ctx *cli.Context) error {
+			fmt.Printf("Hello, Golang!")
+			return nil
+		},
+		Commands: []*cli.Command{
+			{
+				Name:    "test",
+				Usage:   "this is a test command",
+				Aliases: []string{"t"},
+				Action: func(ctx *cli.Context) error {
+					fmt.Println("hello from test command")
+					return nil
+				},
+			},
+			{
+				Name:    "run",
+				Usage:   "time to run",
+				Aliases: []string{"r"},
+				Action: func(ctx *cli.Context) error {
+					fmt.Println("time to run away")
+					return nil
+				},
+				Commands: []*cli.Command{
+					{
+						Name:  "slow",
+						Usage: "run slow",
+						Action: func(ctx *cli.Context) error {
+							fmt.Println("time to run slow")
+							return nil
+						},
+					},
+					{
+						Name:  "fast",
+						Usage: "run fast",
+						Action: func(ctx *cli.Context) error {
+							fmt.Println("time to run fast")
+							return nil
+						},
+					},
+				},
 			},
 		},
 	}
 
-	err := app.Run(os.Args)
-	if err != nil {
-		fmt.Println("Error running CLI:", err)
-		os.Exit(1)
+	if err := app.Execute(os.Args); err != nil {
+		log.Fatal(err)
 	}
 }
+```
+
+CLI Commands and Output
+```shell
+~ % go run main.go test
+hello from test command
+```
+```shell
+~ % go run main.go run
+time to run away
+```
+```shell
+~ % go run main.go run fast
+time to run fast
+```
+
+#### Flags
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+
+	"go.nandlabs.io/commons/cli"
+)
+
+const (
+	ProjectDir  = "pd"
+	ProfileFile = "pf"
+)
+
+func main() {
+	app := &cli.App{
+		Version: "v0.0.1",
+		Action: func(ctx *cli.Context) error {
+			fmt.Printf("Hello, Golang!\n")
+			fmt.Println(ctx.GetFlag(ProjectDir))
+			fmt.Println(ctx.GetFlag(ProfileFile))
+			return nil
+		},
+		Commands: []*cli.Command{
+			{
+				Name:    "test",
+				Usage:   "this is a test command",
+				Aliases: []string{"t"},
+				Action: func(ctx *cli.Context) error {
+					fmt.Println("hello from test command")
+					fmt.Println(ctx.GetFlag(ProjectDir))
+					fmt.Println(ctx.GetFlag(ProfileFile))
+					return nil
+				},
+			},
+			{
+				Name:    "run",
+				Usage:   "time to run",
+				Aliases: []string{"r"},
+				Action: func(ctx *cli.Context) error {
+					fmt.Println("time to run away")
+					fmt.Println(ctx.GetFlag(ProjectDir))
+					fmt.Println(ctx.GetFlag(ProfileFile))
+					return nil
+				},
+				Commands: []*cli.Command{
+					{
+						Name:  "slow",
+						Usage: "run slow",
+						Action: func(ctx *cli.Context) error {
+							fmt.Println("time to run slow")
+							fmt.Println(ctx.GetFlag(ProjectDir))
+							fmt.Println(ctx.GetFlag(ProfileFile))
+							return nil
+						},
+					},
+					{
+						Name:  "fast",
+						Usage: "run fast",
+						Action: func(ctx *cli.Context) error {
+							fmt.Println("time to run fast")
+							fmt.Println(ctx.GetFlag(ProjectDir))
+							fmt.Println(ctx.GetFlag(ProfileFile))
+							return nil
+						},
+					},
+				},
+			},
+		},
+		// global app flags
+		Flags: []*cli.FlagBase{
+			{
+				Name:    ProjectDir,
+				Aliases: []string{"pd"},
+				Default: "",
+				Usage:   "Directory of the project to be built",
+			},
+			{
+				Name:    ProfileFile,
+				Aliases: []string{"pf"},
+				Default: "",
+				Usage:   "Profile file name to be used",
+			},
+		},
+	}
+
+	if err := app.Execute(os.Args); err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+CLI Commands and Output
+```shell
+~ % go run main.go -pd="test" -pf="dev" test
+Hello, Golang!
+test
+dev
+```
+```shell
+~ % go run main.go -pd="test" -pf="dev" run
+time to run away
+test
+dev
+```
+```shell
+~ % go run main.go -pd="test" -pf="dev" run fast
+time to run fast
+test
+dev
 ```

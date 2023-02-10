@@ -18,8 +18,10 @@ type Command struct {
 	// command specific flags
 	Flags []*FlagBase
 	// subcommands of the root command
-	Commands []*Command
-	HelpName string
+	Commands             []*Command
+	HelpName             string
+	UsageText            string
+	SubCommandsAvailable bool
 }
 
 func (command *Command) Run(conTxt *Context, arguments ...string) error {
@@ -38,16 +40,16 @@ func (command *Command) Run(conTxt *Context, arguments ...string) error {
 			return errors.New("command not found")
 		}
 		command.Action = finalCommand.Action
+		conTxt.Command = finalCommand
+	}
+
+	if len(conTxt.Command.Commands) > 0 {
+		conTxt.Command.SubCommandsAvailable = true
 	}
 
 	if isHelpPresent {
-		conTxt.Command = finalCommand
 		return helpCommand.Action(conTxt)
 	}
-
-	//if checkHelpFlag(conTxt, inputArgs) {
-	//	return helpCommand.Action(conTxt)
-	//}
 
 	if command.Action == nil {
 		command.Action = helpCommand.Action
