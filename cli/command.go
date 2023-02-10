@@ -138,3 +138,7 @@ func (command *Command) checkForAlias(arg string) bool {
 func (command *Command) addUserDefinedFlags() {
 	setFlags(command.Name, command.Flags)
 }
+
+func (command *Command) VisibleCommands() []*Command {
+	return command.Commands
+}

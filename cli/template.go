@@ -12,8 +12,7 @@ var CommandHelpTemplate = `NAME:
 USAGE:
    {{template "usageTemplate" .}}{{if .SubCommandsAvailable}}
 
-COMMANDS:
-	{{template "visibleCommandTemplate" .}}{{end}}
+COMMANDS:{{template "visibleCommandTemplate" .}}{{end}}
 `
 
 var AppHelpTemplate = `NAME:
@@ -22,8 +21,7 @@ var AppHelpTemplate = `NAME:
 USAGE:
    {{template "usageTemplate" .}}{{if .CommandVisible}}
 
-COMMANDS:
-	{{template "visibleCommandTemplate" .}}{{end}}{{if .Version}}{{if not .HideVersion}}
+COMMANDS:{{template "visibleCommandTemplate" .}}{{end}}{{if .Version}}{{if not .HideVersion}}
 
 VERSION:
    {{.Version}}{{end}}{{end}}

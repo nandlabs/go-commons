@@ -28,14 +28,12 @@ var helpCommand = &Command{
 	Action: func(conTxt *Context) error {
 		args := conTxt.Args()
 		argsPresent := args.First() != ""
-		firstArg := args.First()
 
 		if conTxt.Command.Name == "help" || conTxt.Command.Name == "h" {
 			conTxt = conTxt.parentContext
 		}
 		if argsPresent {
-			fmt.Println("args present")
-			return ShowCommandHelp(conTxt, firstArg)
+			return ShowCommandHelp(conTxt)
 		}
 
 		if conTxt.parentContext.App == nil {
@@ -47,27 +45,9 @@ var helpCommand = &Command{
 	},
 }
 
-func ShowCommandHelp(conTxt *Context, command string) error {
-	fmt.Println(command)
-	commands := conTxt.App.Commands
-	if conTxt.Command.Commands != nil {
-		commands = conTxt.Command.Commands
-	}
-	//fmt.Println(commands)
-	for _, c := range commands {
-		fmt.Println(c.Name)
-		//if c.HasName(command) {
-		//	fmt.Println("got")
-		//	helpTemplate := CommandHelpTemplate
-		//	PrintHelp(conTxt.App.writer(), helpTemplate, c)
-		//	return nil
-		//}
-	}
-
-	// add check for the command not found
-
-	//conTxt.App.CommandNotFound(conTxt, command)
-
+func ShowCommandHelp(conTxt *Context) error {
+	helpTemplate := CommandHelpTemplate
+	PrintHelp(conTxt.App.writer(), helpTemplate, conTxt.Command)
 	return nil
 }
 
