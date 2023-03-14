@@ -14,12 +14,12 @@ type Response struct {
 }
 
 //IsSuccess determines if the response is a success response
-func (r Response) IsSuccess() bool {
+func (r *Response) IsSuccess() bool {
 	return r.raw.StatusCode >= 200 && r.raw.StatusCode <= 204
 }
 
 //GetError gets the error with status code and value
-func (r Response) GetError() (err error) {
+func (r *Response) GetError() (err error) {
 	if !r.IsSuccess() {
 		err = errutils.FmtError("Server responded with status code %d and status text %s",
 			r.raw.StatusCode, r.raw.Status)
@@ -29,7 +29,7 @@ func (r Response) GetError() (err error) {
 
 //Decode Function decodes the response body to a suitable object. The format of the body is determined by
 //Content-Type header in the response
-func (r Response) Decode(v interface{}) (err error) {
+func (r *Response) Decode(v interface{}) (err error) {
 	var c codec.Codec
 	if r.IsSuccess() {
 		defer ioutils.CloserFunc(r.raw.Body)
@@ -44,6 +44,17 @@ func (r Response) Decode(v interface{}) (err error) {
 	return
 }
 
-func (r Response) Raw() *http.Response {
+//Status Provides status text of the http response
+func (r *Response) Status() string {
+	return r.Raw().Status
+}
+
+//StatusCode provides the status code of the response
+func (r *Response) StatusCode() int {
+	return r.Raw().StatusCode
+}
+
+//Raw Provides the backend raw response
+func (r *Response) Raw() *http.Response {
 	return r.raw
 }
