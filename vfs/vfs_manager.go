@@ -247,3 +247,7 @@ func init() {
 func GetManager() VFileSystem {
 	return manager
 }
+
+func Register(fs VFileSystem) {
+	manager.Register(fs)
+}

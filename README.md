@@ -20,6 +20,7 @@ go get go.nandlabs.io/commons
 * [Http Routing Capabilities  (turbo)](turbo/README.md)
 * [Virtual File System (vfs)](vfs/README.md)
 * [Semver](semver/README.md)
+* [Command Line Interface (CLI) Tool](cli/README.md)
 
 
 ## WIP
