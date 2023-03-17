@@ -44,11 +44,14 @@ func isFlag(item string) bool {
 	return false
 }
 
-func (a *args) checkForHelp() bool {
-	args := (*a)[1:]
-	lastItem := args[len(args)-1]
-	if lastItem == "-help" || lastItem == "-h" {
-		return true
+func (a *args) checkForHelp() (isPresent bool) {
+	programArgs := (*a)[1:]
+	if len(programArgs) > 0 {
+		lastItem := programArgs[len(programArgs)-1]
+		if lastItem == "-help" || lastItem == "-h" {
+			isPresent = true
+		}
 	}
-	return false
+
+	return
 }
