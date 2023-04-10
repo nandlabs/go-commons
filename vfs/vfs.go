@@ -51,8 +51,13 @@ type VFileSystem interface {
 	//If the URL resolves to a file it's not expected to throw an error instead the fn just be invoked with the VFile
 	//representing the url once
 	Walk(url *url.URL, fn WalkFn) error
+	//Find files based on filter only works if the file.IsDir() is true
+	Find(location *url.URL, filter FileFilter) ([]VFile, error)
 	//WalkRaw is same as Walk except that it will accept the url as a string
 	WalkRaw(raw string, fn WalkFn) error
+	//DeleteMatching will delete only the files that match the filter.
+	//If one of the file deletion fails with an error then it stops processing and returns error
+	DeleteMatching(location *url.URL, filter FileFilter) error
 }
 
 type Manager interface {
