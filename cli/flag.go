@@ -7,11 +7,11 @@ import (
 
 var (
 	mappedFlags = make(map[string]interface{})
-	flagMap     = make(map[string]*FlagBase)
+	flagMap     = make(map[string]*Flag)
 )
 
-// FlagBase a flag will always be prefixed with -- (name) or - (alias)
-type FlagBase struct {
+// Flag a flag will always be prefixed with -- (name) or - (alias)
+type Flag struct {
 	Name    string
 	Usage   string
 	Aliases []string
@@ -22,14 +22,14 @@ type FlagBase struct {
 }
 
 // HelpFlag built-in flag present in the system
-var HelpFlag = &FlagBase{
+var HelpFlag = &Flag{
 	Name:    "help",
 	Usage:   "show help",
 	Aliases: []string{"-h", "--help"},
 	Default: "",
 }
 
-func hasFlag(flags []*FlagBase, flag *FlagBase) bool {
+func hasFlag(flags []*Flag, flag *Flag) bool {
 	for _, exist := range flags {
 		if flag == exist {
 			return true
@@ -39,7 +39,7 @@ func hasFlag(flags []*FlagBase, flag *FlagBase) bool {
 }
 
 // improve based on the type of flags
-func setFlags(commandFlags []*FlagBase, inputFlags []string) {
+func setFlags(commandFlags []*Flag, inputFlags []string) {
 	parsedFlags := parseFlags(commandFlags, inputFlags)
 	for _, f := range parsedFlags {
 		if f.Name == "help" {
@@ -50,24 +50,24 @@ func setFlags(commandFlags []*FlagBase, inputFlags []string) {
 	}
 }
 
-func (f *FlagBase) AddFlagToSet() {
+func (f *Flag) AddFlagToSet() {
 	flag.String(f.Name, f.Value.(string), f.Usage)
 }
 
-func (f *FlagBase) AddHelpFlag() {
+func (f *Flag) AddHelpFlag() {
 	flag.Bool(f.Name, true, f.Usage)
 }
 
-func parseFlags(commandFlags []*FlagBase, inputFlags []string) []*FlagBase {
+func parseFlags(commandFlags []*Flag, inputFlags []string) []*Flag {
 	createFlagMap(commandFlags)
-	var result []*FlagBase
+	var result []*Flag
 	for _, item := range inputFlags {
 		itemArr := strings.Split(item, "=")
 		if len(itemArr) > 1 {
 			key := itemArr[0]
 			val := itemArr[1]
 			mappedFlag := flagMap[key]
-			result = append(result, &FlagBase{
+			result = append(result, &Flag{
 				Name:    mappedFlag.Name,
 				Usage:   mappedFlag.Usage,
 				Aliases: nil,
@@ -79,10 +79,10 @@ func parseFlags(commandFlags []*FlagBase, inputFlags []string) []*FlagBase {
 	return result
 }
 
-func createFlagMap(commandFlags []*FlagBase) {
+func createFlagMap(commandFlags []*Flag) {
 	for _, item := range commandFlags {
 		for _, alias := range item.Aliases {
-			flagMap[alias] = &FlagBase{
+			flagMap[alias] = &Flag{
 				Name:    item.Name,
 				Usage:   item.Usage,
 				Aliases: nil,

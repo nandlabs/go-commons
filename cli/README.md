@@ -213,7 +213,7 @@ func main() {
 			},
 		},
 		// global app flags
-		Flags: []*cli.FlagBase{
+		Flags: []*cli.Flag{
 			{
 				Name:    ProjectDir,
 				Aliases: []string{"pd"},
@@ -237,19 +237,19 @@ func main() {
 
 CLI Commands and Output
 ```shell
-~ % go run main.go -pd="test" -pf="dev" test
+~ % go run main.go test -pd="test" -pf="dev"
 Hello, Golang!
 test
 dev
 ```
 ```shell
-~ % go run main.go -pd="test" -pf="dev" run
+~ % go run main.go run -pd="test" -pf="dev"
 time to run away
 test
 dev
 ```
 ```shell
-~ % go run main.go -pd="test" -pf="dev" run fast
+~ % go run main.go run fast -pd="test" -pf="dev"
 time to run fast
 test
 dev

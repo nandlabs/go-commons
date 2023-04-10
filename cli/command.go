@@ -16,7 +16,7 @@ type Command struct {
 	// execute on the command invocation
 	Action ActionFunc
 	// command specific flags
-	Flags []*FlagBase
+	Flags []*Flag
 	// subcommands of the root command
 	Commands             []*Command
 	HelpName             string
@@ -73,8 +73,8 @@ func parseArgs() {
 	})
 }
 
-func (command *Command) allFlags() []*FlagBase {
-	var flags []*FlagBase
+func (command *Command) allFlags() []*Flag {
+	var flags []*Flag
 	flags = append(flags, command.Flags...)
 	return flags
 }
