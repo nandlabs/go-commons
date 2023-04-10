@@ -16,7 +16,7 @@ type Command struct {
 	// execute on the command invocation
 	Action ActionFunc
 	// command specific flags
-	Flags []*FlagBase
+	Flags []*Flag
 	// subcommands of the root command
 	Commands             []*Command
 	HelpName             string
@@ -26,13 +26,15 @@ type Command struct {
 
 func (command *Command) Run(conTxt *Context, arguments ...string) error {
 	a := args(arguments)
-	inputArgs := a.FetchArgs()
-	command.addUserDefinedFlags()
+	output := a.FetchArgs()
+	inputArgs := output.inputCommands
+	inputFlags := output.inputFlags
+
+	command.addUserDefinedFlags(inputFlags)
+	parseArgs()
 
 	isHelpPresent := a.checkForHelp()
 	var finalCommand *Command
-
-	parseArgs()
 
 	if len(inputArgs) > 0 {
 		finalCommand = command.findCommandPath(conTxt, inputArgs)
@@ -62,7 +64,7 @@ func (command *Command) Run(conTxt *Context, arguments ...string) error {
 // with default flag library they can be parsed if they are added before args
 func parseArgs() {
 	flag.Parse()
-	flag.Visit(func(f *flag.Flag) {
+	flag.VisitAll(func(f *flag.Flag) {
 		if f.Value != nil {
 			mappedFlags[f.Name] = f.Value
 		} else {
@@ -71,8 +73,8 @@ func parseArgs() {
 	})
 }
 
-func (command *Command) allFlags() []*FlagBase {
-	var flags []*FlagBase
+func (command *Command) allFlags() []*Flag {
+	var flags []*Flag
 	flags = append(flags, command.Flags...)
 	return flags
 }
@@ -135,8 +137,8 @@ func (command *Command) checkForAlias(arg string) bool {
 	return false
 }
 
-func (command *Command) addUserDefinedFlags() {
-	setFlags(command.Name, command.Flags)
+func (command *Command) addUserDefinedFlags(inputFlags []string) {
+	setFlags(command.Flags, inputFlags)
 }
 
 func (command *Command) VisibleCommands() []*Command {

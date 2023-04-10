@@ -21,7 +21,7 @@ type App struct {
 	// the function to be invoked on the default execution
 	Action ActionFunc
 	// global flags
-	Flags []*FlagBase
+	Flags []*Flag
 	// application commands
 	Commands        []*Command
 	Writer          io.Writer
@@ -133,7 +133,7 @@ func (app *App) appendCommand(c *Command) {
 	}
 }
 
-func (app *App) appendFlag(flag *FlagBase) {
+func (app *App) appendFlag(flag *Flag) {
 	if !hasFlag(app.Flags, flag) {
 		app.Flags = append(app.Flags, flag)
 	}
