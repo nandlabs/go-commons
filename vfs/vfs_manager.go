@@ -207,6 +207,9 @@ func (fs *fileSystems) Register(vfs VFileSystem) {
 	fs.mutex.Lock()
 	fs.mutex.Unlock()
 	for _, s := range vfs.Schemes() {
+		if fs.fileSystems == nil {
+			fs.fileSystems = make(map[string]VFileSystem)
+		}
 		fs.fileSystems[s] = vfs
 	}
 }
