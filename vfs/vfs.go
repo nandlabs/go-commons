@@ -37,6 +37,8 @@ type VFileSystem interface {
 	MkdirAll(u *url.URL) (VFile, error)
 	//MkdirAllRaw same as MkdirAll, however it accepts  url as string
 	MkdirAllRaw(u string) (VFile, error)
+	//RemoveDir will delete the target directory provided in the input URL
+	RemoveDir(u *url.URL) error
 	//Move will
 	Move(src, dst *url.URL) error
 	//MoveRaw same as Move except it accepts url as string

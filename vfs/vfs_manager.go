@@ -20,9 +20,7 @@ func (fs *fileSystems) Copy(src, dst *url.URL) (err error) {
 	if err == nil {
 		err = vfs.Copy(src, dst)
 	}
-
 	return
-
 }
 
 func (fs *fileSystems) CopyRaw(src, dst string) (err error) {
@@ -144,6 +142,15 @@ func (fs *fileSystems) MkdirAllRaw(raw string) (file VFile, err error) {
 	u, err = url.Parse(raw)
 	if err == nil {
 		file, err = fs.MkdirAll(u)
+	}
+	return
+}
+
+func (fs *fileSystems) RemoveDir(u *url.URL) (err error) {
+	var vfs VFileSystem
+	vfs, err = fs.getFsFor(u)
+	if err == nil {
+		err = vfs.RemoveDir(u)
 	}
 	return
 }
