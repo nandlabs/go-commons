@@ -71,18 +71,6 @@ func (o *OsFile) Delete() error {
 	return os.Remove(o.Location.Path)
 }
 
-func (o *OsFile) Find(filter FileFilter) (files []VFile, err error) {
-	err = o.fs.Walk(o.Location, func(file VFile) (err error) {
-		var filterPass bool
-		filterPass, err = filter(file)
-		if err == nil && filterPass {
-			files = append(files, file)
-		}
-		return
-	})
-	return
-}
-
 func (o *OsFile) Info() (VFileInfo, error) {
 	return o.file.Stat()
 }

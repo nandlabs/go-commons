@@ -155,6 +155,18 @@ func (b *BaseVFS) OpenRaw(l string) (file VFile, err error) {
 	return
 }
 
+func (b *BaseVFS) Find(location *url.URL, filter FileFilter) (files []VFile, err error) {
+	err = b.Walk(location, func(file VFile) (err error) {
+		var filterPass bool
+		filterPass, err = filter(file)
+		if err == nil && filterPass {
+			files = append(files, file)
+		}
+		return
+	})
+	return
+}
+
 func (b *BaseVFS) Walk(u *url.URL, fn WalkFn) (err error) {
 	var src VFile
 	var srcFi VFileInfo
@@ -194,6 +206,20 @@ func (b *BaseVFS) WalkRaw(raw string, fn WalkFn) (err error) {
 	u, err = url.Parse(raw)
 	if err == nil {
 		err = b.Walk(u, fn)
+	}
+	return
+}
+
+func (b *BaseVFS) DeleteMatching(location *url.URL, filter FileFilter) (err error) {
+	var files []VFile
+	files, err = b.Find(location, filter)
+	if err == nil {
+		for _, file := range files {
+			err = file.Delete()
+			if err != nil {
+				break
+			}
+		}
 	}
 	return
 }

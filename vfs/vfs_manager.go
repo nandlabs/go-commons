@@ -240,8 +240,25 @@ func (fs *fileSystems) WalkRaw(raw string, fn WalkFn) (err error) {
 	return
 }
 
-func init() {
+func (fs *fileSystems) Find(url *url.URL, filter FileFilter) (files []VFile, err error) {
+	var vfs VFileSystem
+	vfs, err = fs.getFsFor(url)
+	if err == nil {
+		files, err = vfs.Find(url, filter)
+	}
+	return
+}
 
+func (fs *fileSystems) DeleteMatching(url *url.URL, filter FileFilter) (err error) {
+	var vfs VFileSystem
+	vfs, err = fs.getFsFor(url)
+	if err == nil {
+		err = vfs.DeleteMatching(url, filter)
+	}
+	return
+}
+
+func init() {
 	manager = &fileSystems{}
 	localFs := &OsFs{}
 	manager.Register(localFs)
