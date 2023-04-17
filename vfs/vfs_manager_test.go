@@ -7,8 +7,11 @@ import (
 	"testing"
 )
 
-func getParsedUrl(input string) (u *url.URL) {
-	u, _ = url.Parse(input)
+func getParsedUrl(input string) (output *url.URL) {
+	currentPath, _ := os.Getwd()
+	u, _ := url.Parse(input)
+	path := currentPath + u.Path
+	output, _ = url.Parse(u.Scheme + "://" + path)
 	return
 }
 
@@ -59,7 +62,7 @@ func TestFileSystems_Mkdir(t *testing.T) {
 				fileSystems: map[string]VFileSystem{"file": &OsFs{}, "": &OsFs{}},
 			},
 			args: args{
-				u: getParsedUrl("file://./tests"),
+				u: getParsedUrl("file:///tests"),
 			},
 			wantDirName: "tests",
 			wantErr:     false,
@@ -70,7 +73,7 @@ func TestFileSystems_Mkdir(t *testing.T) {
 				fileSystems: map[string]VFileSystem{"file": &OsFs{}, "": &OsFs{}},
 			},
 			args: args{
-				u: getParsedUrl("file://./tests/dummy"),
+				u: getParsedUrl("file:///tests/dummy"),
 			},
 			wantDirName: "dummy",
 			wantErr:     false,
@@ -119,7 +122,7 @@ func TestFileSystems_Create(t *testing.T) {
 				fileSystems: map[string]VFileSystem{"file": &OsFs{}, "": &OsFs{}},
 			},
 			args: args{
-				u: getParsedUrl("file://./tests/abc.txt"),
+				u: getParsedUrl("file:///tests/abc.txt"),
 			},
 			wantFileName: "abc.txt",
 			wantErr:      false,
@@ -130,7 +133,7 @@ func TestFileSystems_Create(t *testing.T) {
 				fileSystems: map[string]VFileSystem{"file": &OsFs{}, "": &OsFs{}},
 			},
 			args: args{
-				u: getParsedUrl("file://./tests/dummy/dummy.txt"),
+				u: getParsedUrl("file:///tests/dummy/dummy.txt"),
 			},
 			wantFileName: "dummy.txt",
 			wantErr:      false,
@@ -172,11 +175,12 @@ func TestFileSystems_Copy(t *testing.T) {
 		{
 			name: "Copy File",
 			fields: fields{
+				// TODO : this is the issue, we are creating fileSystem with blank structs
 				fileSystems: map[string]VFileSystem{"file": &OsFs{}, "": &OsFs{}},
 			},
 			args: args{
-				src:  getParsedUrl("file://./tests/abc.txt"),
-				dest: getParsedUrl("file://./tests/dummy/abc-copy.txt"),
+				src:  getParsedUrl("file:///tests/abc.txt"),
+				dest: getParsedUrl("file:///tests/dummy/abc-copy.txt"),
 			},
 			wantErr: false,
 		},
