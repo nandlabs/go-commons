@@ -8,7 +8,7 @@ import (
 
 type FileFilter func(file VFile) (bool, error)
 
-//VFile interface provides the basic functions required to interact
+// VFile interface provides the basic functions required to interact
 type VFile interface {
 	//Closer interface included from io package
 	io.Closer
@@ -18,12 +18,6 @@ type VFile interface {
 	ListAll() ([]VFile, error)
 	//Delete the file object. If the file type is directory all  files and subdirectories will be deleted
 	Delete() error
-	//DeleteMatching will delete only the files that match the filter.
-	//Throws error if the files is not a dir type
-	//If one of the file deletion fails with an error then it stops processing and returns error
-	DeleteMatching(filter FileFilter) error
-	//Find files based on filter only works if the file.IsDir() is true
-	Find(filter FileFilter) ([]VFile, error)
 	//Info  Get the file ifo
 	Info() (VFileInfo, error)
 	//Parent of the file system
@@ -36,7 +30,7 @@ type VFile interface {
 	GetProperty(name string) (string, error)
 }
 
-//VFileContent interface providers access to the content
+// VFileContent interface providers access to the content
 type VFileContent interface {
 	io.ReadWriteSeeker
 	//AsString content of the file. This should be used very carefully as it is not wise to load a large file in to string
