@@ -1,6 +1,7 @@
 package vfs
 
 import (
+	"fmt"
 	"net/url"
 	"sync"
 
@@ -161,7 +162,6 @@ func (fs *fileSystems) Move(src, dst *url.URL) (err error) {
 	if err == nil {
 		err = vfs.Move(src, dst)
 	}
-
 	return
 }
 
@@ -266,12 +266,13 @@ func (fs *fileSystems) DeleteMatching(url *url.URL, filter FileFilter) (err erro
 }
 
 func init() {
+	fmt.Println("init called")
 	manager = &fileSystems{}
 	localFs := &OsFs{}
 	manager.Register(localFs)
 }
 
-func GetManager() VFileSystem {
+func GetManager() Manager {
 	return manager
 }
 
