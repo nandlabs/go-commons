@@ -15,25 +15,21 @@ func (b *BaseVFS) Copy(src, dst *url.URL) (err error) {
 	var srcFile VFile
 	var srfFileInfo VFileInfo
 	srcFile, err = b.Open(src)
-
 	if err == nil {
 		defer ioutils.CloserFunc(srcFile)
 		srfFileInfo, err = srcFile.Info()
 		if err == nil {
 			if srfFileInfo.IsDir() {
-
 				err = b.Walk(src, func(file VFile) (err error) {
 					var fileInfo VFileInfo
 					fileInfo, err = srcFile.Info()
 					if err == nil {
 						if fileInfo.IsDir() {
-
+							// TODO : copy to destination directory not implemented yet
 						}
 					}
-
 					return
 				})
-
 				// Create directories and copy files
 			} else {
 				var destFile VFile
@@ -117,6 +113,7 @@ func (b *BaseVFS) MkdirRaw(u string) (vFile VFile, err error) {
 	}
 	return
 }
+
 func (b *BaseVFS) MkdirAllRaw(u string) (vFile VFile, err error) {
 	var fileUrl *url.URL
 	fileUrl, err = url.Parse(u)
