@@ -228,6 +228,18 @@ func TestFileSystems_Schemes(t *testing.T) {
 	fmt.Println(output)
 }
 
+func Test_InvalidFS(t *testing.T) {
+	testManager := GetManager()
+	u := GetRawPath("dummy:///raw-abc.txt")
+	_, err := testManager.CreateRaw(u)
+	if err == nil {
+		t.Errorf("CreateRaw() error = %v", err)
+	}
+	if err.Error() != "Unsupported scheme dummy for in the url "+u {
+		t.Errorf("Test_InvalidFS() error = %v", err)
+	}
+}
+
 func TestFileSystems_IsSupported(t *testing.T) {
 	var scheme string
 	var output bool
