@@ -94,7 +94,7 @@ func TestFileSystems_RemoveDir(t *testing.T) {
 	if err != nil {
 		t.Errorf("Mkdir() error = %v", err)
 	}
-	err = testManager.RemoveDir(u)
+	err = testManager.Delete(u)
 	if err != nil {
 		t.Errorf("RemoveDir() error = %v", err)
 	}
@@ -206,20 +206,20 @@ func TestFileSystems_OpenRaw(t *testing.T) {
 }
 
 // TODO : not implemented yet
-//func TestFileSystems_Copy(t *testing.T) {
-//	testManager := GetManager()
-//
-//	src := GetParsedUrl("file:///tests/abc-copy-tst.txt")
-//	dest := GetParsedUrl("file:///tests1")
-//	_, err := testManager.Create(src)
-//	if err != nil {
-//		t.Errorf("Create() error = %v", err)
-//	}
-//	err = testManager.Copy(src, dest)
-//	if err != nil {
-//		t.Errorf("Copy() error = %v", err)
-//	}
-//}
+func TestFileSystems_Copy(t *testing.T) {
+	testManager := GetManager()
+
+	src := GetParsedUrl("file:///tests/abc-copy-tst.txt")
+	dest := GetParsedUrl("file:///tests1/copy-file.txt")
+	_, err := testManager.Create(src)
+	if err != nil {
+		t.Errorf("Create() error = %v", err)
+	}
+	err = testManager.Copy(src, dest)
+	if err != nil {
+		t.Errorf("Copy() error = %v", err)
+	}
+}
 
 func TestFileSystems_Schemes(t *testing.T) {
 	testManager := GetManager()
@@ -259,8 +259,13 @@ func TestFileSystems_IsSupported(t *testing.T) {
 }
 
 func Test_RemoveAllTestsDirs(t *testing.T) {
-	os.RemoveAll("./tests")
-	os.RemoveAll("./all")
-	os.RemoveAll("./all-raw")
-	os.RemoveAll("./tests1")
+	testManager := GetManager()
+
+	err := testManager.Delete(GetParsedUrl("file:///tests"))
+	err = testManager.Delete(GetParsedUrl("file:///all"))
+	err = testManager.Delete(GetParsedUrl("file:///all-raw"))
+	err = testManager.Delete(GetParsedUrl("file:///tests1"))
+	if err != nil {
+		t.Errorf("Delete() error = %v", err)
+	}
 }

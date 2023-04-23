@@ -1,6 +1,7 @@
 package vfs
 
 import (
+	"fmt"
 	"io"
 	"net/url"
 
@@ -18,6 +19,7 @@ func (b *BaseVFS) Copy(src, dst *url.URL) (err error) {
 	if err == nil {
 		defer ioutils.CloserFunc(srcFile)
 		srfFileInfo, err = srcFile.Info()
+		fmt.Println(srfFileInfo.IsDir())
 		if err == nil {
 			if srfFileInfo.IsDir() {
 				err = b.Walk(src, func(file VFile) (err error) {
@@ -25,7 +27,7 @@ func (b *BaseVFS) Copy(src, dst *url.URL) (err error) {
 					fileInfo, err = srcFile.Info()
 					if err == nil {
 						if fileInfo.IsDir() {
-							// TODO : copy to destination directory not implemented yet
+
 						}
 					}
 					return
@@ -34,6 +36,7 @@ func (b *BaseVFS) Copy(src, dst *url.URL) (err error) {
 			} else {
 				var destFile VFile
 				destFile, err = manager.Create(dst)
+				fmt.Println(err)
 				defer ioutils.CloserFunc(destFile)
 				if err == nil {
 					_, err = io.Copy(srcFile, destFile)
@@ -69,10 +72,19 @@ func (b *BaseVFS) CreateRaw(u string) (file VFile, err error) {
 
 func (b *BaseVFS) Delete(src *url.URL) (err error) {
 	var srcFile VFile
+	var srfFileInfo VFileInfo
+
 	srcFile, err = b.Open(src)
 	if err == nil {
 		defer ioutils.CloserFunc(srcFile)
-		err = srcFile.Delete()
+		srfFileInfo, err = srcFile.Info()
+		if err == nil {
+			if srfFileInfo.IsDir() {
+				err = srcFile.DeleteAll()
+			} else {
+				err = srcFile.Delete()
+			}
+		}
 	}
 	return
 }
@@ -209,11 +221,24 @@ func (b *BaseVFS) WalkRaw(raw string, fn WalkFn) (err error) {
 
 func (b *BaseVFS) DeleteMatching(location *url.URL, filter FileFilter) (err error) {
 	var files []VFile
+	var fileInfo VFileInfo
 	files, err = b.Find(location, filter)
 	if err == nil {
 		for _, file := range files {
-			err = file.Delete()
-			if err != nil {
+			fileInfo, err = file.Info()
+			if err == nil {
+				if fileInfo.IsDir() {
+					err = file.DeleteAll()
+					if err != nil {
+						break
+					}
+				} else {
+					err = file.Delete()
+					if err != nil {
+						break
+					}
+				}
+			} else {
 				break
 			}
 		}

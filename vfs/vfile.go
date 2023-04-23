@@ -18,6 +18,7 @@ type VFile interface {
 	ListAll() ([]VFile, error)
 	//Delete the file object. If the file type is directory all  files and subdirectories will be deleted
 	Delete() error
+	DeleteAll() error
 	//Info  Get the file ifo
 	Info() (VFileInfo, error)
 	//Parent of the file system

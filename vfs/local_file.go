@@ -71,6 +71,10 @@ func (o *OsFile) Delete() error {
 	return os.Remove(o.Location.Path)
 }
 
+func (o *OsFile) DeleteAll() error {
+	return os.RemoveAll(o.Location.Path)
+}
+
 func (o *OsFile) Info() (VFileInfo, error) {
 	return o.file.Stat()
 }

@@ -58,11 +58,6 @@ func (o OsFs) Open(u *url.URL) (file VFile, err error) {
 	return
 }
 
-func (o OsFs) RemoveDir(location *url.URL) (err error) {
-	err = os.Remove(location.Path)
-	return
-}
-
 func (o OsFs) Schemes() []string {
 	return localFsSchemes
 }

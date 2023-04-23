@@ -156,15 +156,6 @@ func (fs *fileSystems) ListRaw(raw string) (files []VFile, err error) {
 	return
 }
 
-func (fs *fileSystems) RemoveDir(u *url.URL) (err error) {
-	var vfs VFileSystem
-	vfs, err = fs.getFsFor(u)
-	if err == nil {
-		err = vfs.RemoveDir(u)
-	}
-	return
-}
-
 func (fs *fileSystems) Move(src, dst *url.URL) (err error) {
 	var vfs VFileSystem
 	vfs, err = fs.getFsFor(src)
