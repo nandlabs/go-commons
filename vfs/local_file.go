@@ -47,6 +47,7 @@ func (o *OsFile) ListAll() (files []VFile, err error) {
 		var child VFile
 		var childUrl *url.URL
 		for _, fi := range fis {
+			// TODO : in case of nested folder structure, does this work?
 			childUrl, err = o.Location.Parse(textutils.ForwardSlashStr + fi.Name())
 			if err == nil {
 				child, err = manager.Open(childUrl)
@@ -63,7 +64,6 @@ func (o *OsFile) ListAll() (files []VFile, err error) {
 			files = children
 		}
 	}
-
 	return
 }
 

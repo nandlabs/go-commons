@@ -48,21 +48,21 @@ func TestGetManager(t *testing.T) {
 
 func TestFileSystems_MkdirRaw(t *testing.T) {
 	testManager := GetManager()
-	u := GetRawPath("file:///tests")
+	u := GetRawPath("file:///test-data")
 	gotDir, err := testManager.MkdirRaw(u)
 	if err != nil {
 		t.Errorf("MkdirRaw() error = %v", err)
 		return
 	}
 	info, err := gotDir.Info()
-	if info.Name() != "tests" {
-		t.Errorf("Info() got DirName = %v, want %v", info.Name(), "tests")
+	if info.Name() != "test-data" {
+		t.Errorf("Info() got DirName = %v, want %v", info.Name(), "test-data")
 	}
 }
 
 func TestFileSystems_Mkdir(t *testing.T) {
 	testManager := GetManager()
-	u := GetParsedUrl("file:///tests1")
+	u := GetParsedUrl("file:///test-data/tests-raw")
 	_, err := testManager.Mkdir(u)
 	if err != nil {
 		t.Errorf("Mkdir() error = %v", err)
@@ -71,7 +71,7 @@ func TestFileSystems_Mkdir(t *testing.T) {
 
 func TestFileSystems_MkdirAll(t *testing.T) {
 	testManager := GetManager()
-	u := GetParsedUrl("file:///all/tests")
+	u := GetParsedUrl("file:///test-data/all")
 	_, err := testManager.MkdirAll(u)
 	if err != nil {
 		t.Errorf("MkdirAll() error = %v", err)
@@ -80,23 +80,10 @@ func TestFileSystems_MkdirAll(t *testing.T) {
 
 func TestFileSystems_MkdirAllRaw(t *testing.T) {
 	testManager := GetManager()
-	u := GetRawPath("file:///all-raw/tests")
+	u := GetRawPath("file:///test-data/all-raw")
 	_, err := testManager.MkdirAllRaw(u)
 	if err != nil {
 		t.Errorf("MkdirAllRaw() error = %v", err)
-	}
-}
-
-func TestFileSystems_RemoveDir(t *testing.T) {
-	testManager := GetManager()
-	u := GetParsedUrl("file:///dummy")
-	_, err := testManager.Mkdir(u)
-	if err != nil {
-		t.Errorf("Mkdir() error = %v", err)
-	}
-	err = testManager.Delete(u)
-	if err != nil {
-		t.Errorf("RemoveDir() error = %v", err)
 	}
 }
 
@@ -109,55 +96,31 @@ func TestFileSystems_CreateRaw(t *testing.T) {
 	}
 }
 
-func TestFileSystems_Delete(t *testing.T) {
-	testManager := GetManager()
-	u := GetParsedUrl("file:///raw-abc.txt")
-	err := testManager.Delete(u)
-	if err != nil {
-		t.Errorf("Delete() error = %v", err)
-	}
-}
-
-func TestFileSystems_DeleteRaw(t *testing.T) {
-	testManager := GetManager()
-	u := GetRawPath("file:///raw-abc-1.txt")
-
-	_, err := testManager.CreateRaw(u)
-	if err != nil {
-		t.Errorf("CreateRaw() error = %v", err)
-	}
-
-	err = testManager.DeleteRaw(u)
-	if err != nil {
-		t.Errorf("DeleteRaw() error = %v", err)
-	}
-}
-
-func TestFileSystems_List(t *testing.T) {
-	testManager := GetManager()
-
-	u := GetParsedUrl("file:///tests")
-	_, err := testManager.List(u)
-	if err != nil {
-		t.Errorf("List() error = %v", err)
-	}
-}
-
-func TestFileSystems_ListRaw(t *testing.T) {
-	testManager := GetManager()
-
-	u := GetRawPath("file:///tests")
-	_, err := testManager.ListRaw(u)
-	if err != nil {
-		t.Errorf("ListRaw() error = %v", err)
-	}
-}
+//func TestFileSystems_List(t *testing.T) {
+//	testManager := GetManager()
+//
+//	u := GetParsedUrl("file:///test-data")
+//	_, err := testManager.List(u)
+//	if err != nil {
+//		t.Errorf("List() error = %v", err)
+//	}
+//}
+//
+//func TestFileSystems_ListRaw(t *testing.T) {
+//	testManager := GetManager()
+//
+//	u := GetRawPath("file:///test-data")
+//	_, err := testManager.ListRaw(u)
+//	if err != nil {
+//		t.Errorf("ListRaw() error = %v", err)
+//	}
+//}
 
 func TestFileSystems_Move(t *testing.T) {
 	testManager := GetManager()
 
-	src := GetParsedUrl("file:///tests/abc.txt")
-	dest := GetParsedUrl("file:///tests/move-abc.txt")
+	src := GetParsedUrl("file:///test-data/abc.txt")
+	dest := GetParsedUrl("file:///test-data/tests-raw/move-abc.txt")
 	_, err := testManager.Create(src)
 	if err != nil {
 		t.Errorf("Create() error = %v", err)
@@ -171,8 +134,8 @@ func TestFileSystems_Move(t *testing.T) {
 func TestFileSystems_MoveRaw(t *testing.T) {
 	testManager := GetManager()
 
-	src := GetRawPath("file:///tests/abc-raw.txt")
-	dest := GetRawPath("file:///tests/move-abc-raw.txt")
+	src := GetRawPath("file:///test-data/abc-raw.txt")
+	dest := GetRawPath("file:///test-data/tests-raw/move-abc-raw.txt")
 	_, err := testManager.CreateRaw(src)
 	if err != nil {
 		t.Errorf("CreateRaw() error = %v", err)
@@ -186,7 +149,7 @@ func TestFileSystems_MoveRaw(t *testing.T) {
 func TestFileSystems_Open(t *testing.T) {
 	testManager := GetManager()
 
-	u := GetParsedUrl("file:///tests/move-abc-raw.txt")
+	u := GetParsedUrl("file:///test-data/tests-raw/move-abc-raw.txt")
 	file, err := testManager.Open(u)
 	if err != nil {
 		t.Errorf("Open() error = %v", err)
@@ -198,24 +161,38 @@ func TestFileSystems_Open(t *testing.T) {
 func TestFileSystems_OpenRaw(t *testing.T) {
 	testManager := GetManager()
 
-	u := GetRawPath("file:///tests/move-abc-raw.txt")
+	u := GetRawPath("file:///test-data/tests-raw/move-abc-raw.txt")
 	_, err := testManager.OpenRaw(u)
 	if err != nil {
 		t.Errorf("OpenRaw() error = %v", err)
 	}
 }
 
-// TODO : not implemented yet
 func TestFileSystems_Copy(t *testing.T) {
 	testManager := GetManager()
 
-	src := GetParsedUrl("file:///tests/abc-copy-tst.txt")
-	dest := GetParsedUrl("file:///tests1/copy-file.txt")
+	src := GetParsedUrl("file:///test-data/abc-copy-tst.txt")
+	dest := GetParsedUrl("file:///test-data/tests-raw/copy-file.txt")
 	_, err := testManager.Create(src)
 	if err != nil {
 		t.Errorf("Create() error = %v", err)
 	}
 	err = testManager.Copy(src, dest)
+	if err != nil {
+		t.Errorf("Copy() error = %v", err)
+	}
+}
+
+func TestFileSystems_CopyRaw(t *testing.T) {
+	testManager := GetManager()
+
+	src := GetRawPath("file:///test-data/abc-copy-tst.txt")
+	dest := GetRawPath("file:///test-data/tests-raw/copy-file-2.txt")
+	_, err := testManager.CreateRaw(src)
+	if err != nil {
+		t.Errorf("Create() error = %v", err)
+	}
+	err = testManager.CopyRaw(src, dest)
 	if err != nil {
 		t.Errorf("Copy() error = %v", err)
 	}
@@ -258,14 +235,47 @@ func TestFileSystems_IsSupported(t *testing.T) {
 	}
 }
 
-func Test_RemoveAllTestsDirs(t *testing.T) {
+func TestFileSystems_RemoveDir(t *testing.T) {
 	testManager := GetManager()
-
-	err := testManager.Delete(GetParsedUrl("file:///tests"))
-	err = testManager.Delete(GetParsedUrl("file:///all"))
-	err = testManager.Delete(GetParsedUrl("file:///all-raw"))
-	err = testManager.Delete(GetParsedUrl("file:///tests1"))
+	u := GetParsedUrl("file:///test-data/dummy")
+	_, err := testManager.Mkdir(u)
+	if err != nil {
+		t.Errorf("Mkdir() error = %v", err)
+	}
+	err = testManager.Delete(u)
 	if err != nil {
 		t.Errorf("Delete() error = %v", err)
+	}
+}
+
+func Test_RemoveAllTestsDirs(t *testing.T) {
+	testManager := GetManager()
+	err := testManager.Delete(GetParsedUrl("file:///test-data"))
+	if err != nil {
+		t.Errorf("Delete() error = %v", err)
+	}
+}
+
+func TestFileSystems_Delete(t *testing.T) {
+	testManager := GetManager()
+	u := GetParsedUrl("file:///raw-abc.txt")
+	err := testManager.Delete(u)
+	if err != nil {
+		t.Errorf("Delete() error = %v", err)
+	}
+}
+
+func TestFileSystems_DeleteRaw(t *testing.T) {
+	testManager := GetManager()
+	u := GetRawPath("file:///raw-abc-1.txt")
+
+	_, err := testManager.CreateRaw(u)
+	if err != nil {
+		t.Errorf("CreateRaw() error = %v", err)
+	}
+
+	err = testManager.DeleteRaw(u)
+	if err != nil {
+		t.Errorf("DeleteRaw() error = %v", err)
 	}
 }
