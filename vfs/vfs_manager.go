@@ -248,10 +248,7 @@ func (fs *fileSystems) getFsFor(src *url.URL) (vfs VFileSystem, err error) {
 
 func init() {
 	manager = &fileSystems{}
-	// TODO : this does not seem right, might be a fundamental flaw in design?
-	osFs := &OsFs{}
-	baseFs := &BaseVFS{VFileSystem: osFs}
-	localFs := &OsFs{BaseVFS: baseFs}
+	localFs := &OsFs{}
 	manager.Register(localFs)
 }
 

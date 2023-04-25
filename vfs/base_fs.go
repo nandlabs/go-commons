@@ -1,7 +1,6 @@
 package vfs
 
 import (
-	"fmt"
 	"io"
 	"net/url"
 
@@ -19,7 +18,6 @@ func (b *BaseVFS) Copy(src, dst *url.URL) (err error) {
 	if err == nil {
 		defer ioutils.CloserFunc(srcFile)
 		srfFileInfo, err = srcFile.Info()
-		fmt.Println(srfFileInfo.IsDir())
 		if err == nil {
 			if srfFileInfo.IsDir() {
 				err = b.Walk(src, func(file VFile) (err error) {
@@ -36,7 +34,6 @@ func (b *BaseVFS) Copy(src, dst *url.URL) (err error) {
 			} else {
 				var destFile VFile
 				destFile, err = manager.Create(dst)
-				fmt.Println(err)
 				defer ioutils.CloserFunc(destFile)
 				if err == nil {
 					_, err = io.Copy(srcFile, destFile)

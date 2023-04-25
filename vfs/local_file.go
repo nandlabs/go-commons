@@ -110,5 +110,4 @@ func (o *OsFile) AddProperty(name string, value string) error {
 func (o *OsFile) GetProperty(name string) (v string, err error) {
 	err = errutils.FmtError("Unsupported operation GetProperty for scheme")
 	return
-
 }
