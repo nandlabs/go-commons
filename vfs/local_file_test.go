@@ -1,6 +1,7 @@
 package vfs
 
 import (
+	"fmt"
 	"net/url"
 	"os"
 	"testing"
@@ -157,6 +158,31 @@ func TestBaseVFS_MoveRaw(t *testing.T) {
 	if err != nil {
 		t.Errorf("MoveRaw() error = %v", err)
 	}
+}
+
+func TestBaseVFS_Find(t *testing.T) {
+	u := GetParsedUrl("file:///test-data/filterFile.txt")
+	_, err := testLocalFsObj.Create(u)
+	if err != nil {
+		t.Errorf("Create() error = %v", err)
+	}
+	filterFunc := func(createdFile VFile) (result bool, err error) {
+		var fileInfo VFileInfo
+		result = false
+
+		fileInfo, err = createdFile.Info()
+		if err != nil {
+			return
+		}
+		if fileInfo.Name() == "filterFile.txt" {
+			result = true
+		}
+		return
+	}
+	u2 := GetParsedUrl("file:///test-data")
+	files, err := testLocalFsObj.Find(u2, filterFunc)
+	// TODO : filter func not implemented completely due to issue with ListAll()
+	fmt.Println(len(files))
 }
 
 func TestOsFs_Delete(t *testing.T) {
