@@ -1,6 +1,7 @@
 package vfs
 
 import (
+	"fmt"
 	"io/fs"
 	"io/ioutil"
 	"net/url"
@@ -47,6 +48,7 @@ func (o *OsFile) ListAll() (files []VFile, err error) {
 		var child VFile
 		var childUrl *url.URL
 		for _, fi := range fis {
+			// TODO : in case of nested folder structure, does this work?
 			childUrl, err = o.Location.Parse(textutils.ForwardSlashStr + fi.Name())
 			if err == nil {
 				child, err = manager.Open(childUrl)
@@ -63,12 +65,15 @@ func (o *OsFile) ListAll() (files []VFile, err error) {
 			files = children
 		}
 	}
-
 	return
 }
 
 func (o *OsFile) Delete() error {
 	return os.Remove(o.Location.Path)
+}
+
+func (o *OsFile) DeleteAll() error {
+	return os.RemoveAll(o.Location.Path)
 }
 
 func (o *OsFile) Info() (VFileInfo, error) {
@@ -77,7 +82,9 @@ func (o *OsFile) Info() (VFileInfo, error) {
 
 func (o *OsFile) Parent() (file VFile, err error) {
 	var fileInfos []fs.FileInfo
+	fmt.Println(o.Location.Path)
 	fileInfos, err = ioutil.ReadDir(o.Location.Path)
+	fmt.Println(fileInfos)
 	if err == nil {
 		for _, info := range fileInfos {
 			var f *os.File
@@ -106,5 +113,4 @@ func (o *OsFile) AddProperty(name string, value string) error {
 func (o *OsFile) GetProperty(name string) (v string, err error) {
 	err = errutils.FmtError("Unsupported operation GetProperty for scheme")
 	return
-
 }

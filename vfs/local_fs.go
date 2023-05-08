@@ -10,7 +10,7 @@ const (
 	emptyScheme = ""
 )
 
-var localFsSchemes []string = []string{fileScheme, emptyScheme}
+var localFsSchemes = []string{fileScheme, emptyScheme}
 
 type OsFs struct {
 	*BaseVFS
@@ -30,7 +30,6 @@ func (o OsFs) Create(u *url.URL) (file VFile, err error) {
 }
 
 func (o OsFs) Mkdir(u *url.URL) (file VFile, err error) {
-
 	err = os.Mkdir(u.Path, os.ModePerm)
 	if err == nil {
 		file, err = o.Open(u)

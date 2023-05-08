@@ -14,15 +14,67 @@ type fileSystems struct {
 	fileSystems map[string]VFileSystem
 }
 
+func (fs *fileSystems) Mkdir(url *url.URL) (file VFile, err error) {
+	var vfs VFileSystem
+	vfs, err = fs.getFsFor(url)
+	if err == nil {
+		file, err = vfs.Mkdir(url)
+	}
+	return
+}
+
+func (fs *fileSystems) MkdirRaw(raw string) (file VFile, err error) {
+	var u *url.URL
+	u, err = url.Parse(raw)
+	if err == nil {
+		file, err = fs.Mkdir(u)
+	}
+	return
+}
+
+func (fs *fileSystems) MkdirAll(url *url.URL) (file VFile, err error) {
+	var vfs VFileSystem
+	vfs, err = fs.getFsFor(url)
+	if err == nil {
+		file, err = vfs.MkdirAll(url)
+	}
+	return
+}
+
+func (fs *fileSystems) MkdirAllRaw(raw string) (file VFile, err error) {
+	var u *url.URL
+	u, err = url.Parse(raw)
+	if err == nil {
+		file, err = fs.MkdirAll(u)
+	}
+	return
+}
+
+func (fs *fileSystems) Create(u *url.URL) (file VFile, err error) {
+	var vfs VFileSystem
+	vfs, err = fs.getFsFor(u)
+	if err == nil {
+		file, err = vfs.Create(u)
+	}
+	return
+}
+
+func (fs *fileSystems) CreateRaw(raw string) (file VFile, err error) {
+	var u *url.URL
+	u, err = url.Parse(raw)
+	if err == nil {
+		file, err = fs.Create(u)
+	}
+	return
+}
+
 func (fs *fileSystems) Copy(src, dst *url.URL) (err error) {
 	var vfs VFileSystem
 	vfs, err = fs.getFsFor(src)
 	if err == nil {
 		err = vfs.Copy(src, dst)
 	}
-
 	return
-
 }
 
 func (fs *fileSystems) CopyRaw(src, dst string) (err error) {
@@ -59,24 +111,6 @@ func (fs *fileSystems) CopyRaw(src, dst string) (err error) {
 //	return
 //}
 
-func (fs *fileSystems) Create(u *url.URL) (file VFile, err error) {
-	var vfs VFileSystem
-	vfs, err = fs.getFsFor(u)
-	if err == nil {
-		file, err = vfs.Create(u)
-	}
-	return
-}
-
-func (fs *fileSystems) CreateRaw(raw string) (file VFile, err error) {
-	var u *url.URL
-	u, err = url.Parse(raw)
-	if err == nil {
-		file, err = fs.Create(u)
-	}
-	return
-}
-
 func (fs *fileSystems) Delete(u *url.URL) (err error) {
 	var vfs VFileSystem
 	vfs, err = fs.getFsFor(u)
@@ -91,6 +125,15 @@ func (fs *fileSystems) DeleteRaw(raw string) (err error) {
 	u, err = url.Parse(raw)
 	if err == nil {
 		err = fs.Delete(u)
+	}
+	return
+}
+
+func (fs *fileSystems) DeleteMatching(url *url.URL, filter FileFilter) (err error) {
+	var vfs VFileSystem
+	vfs, err = fs.getFsFor(url)
+	if err == nil {
+		err = vfs.DeleteMatching(url, filter)
 	}
 	return
 }
@@ -113,48 +156,12 @@ func (fs *fileSystems) ListRaw(raw string) (files []VFile, err error) {
 	return
 }
 
-func (fs *fileSystems) Mkdir(url *url.URL) (file VFile, err error) {
-	var vfs VFileSystem
-	vfs, err = fs.getFsFor(url)
-	if err == nil {
-		file, err = vfs.Mkdir(url)
-	}
-	return
-}
-func (fs *fileSystems) MkdirRaw(raw string) (file VFile, err error) {
-	var u *url.URL
-	u, err = url.Parse(raw)
-	if err == nil {
-		file, err = fs.Mkdir(u)
-	}
-	return
-}
-
-func (fs *fileSystems) MkdirAll(url *url.URL) (file VFile, err error) {
-	var vfs VFileSystem
-	vfs, err = fs.getFsFor(url)
-	if err == nil {
-		file, err = vfs.MkdirAll(url)
-	}
-	return
-}
-
-func (fs *fileSystems) MkdirAllRaw(raw string) (file VFile, err error) {
-	var u *url.URL
-	u, err = url.Parse(raw)
-	if err == nil {
-		file, err = fs.MkdirAll(u)
-	}
-	return
-}
-
 func (fs *fileSystems) Move(src, dst *url.URL) (err error) {
 	var vfs VFileSystem
 	vfs, err = fs.getFsFor(src)
 	if err == nil {
 		err = vfs.Move(src, dst)
 	}
-
 	return
 }
 
@@ -188,37 +195,6 @@ func (fs *fileSystems) OpenRaw(raw string) (file VFile, err error) {
 	return
 }
 
-func (fs *fileSystems) Schemes() (schemes []string) {
-	for k := range fs.fileSystems {
-		if k == "" {
-			continue
-		}
-		schemes = append(schemes, k)
-	}
-	return
-}
-
-func (fs *fileSystems) IsSupported(scheme string) (supported bool) {
-	_, supported = fs.fileSystems[scheme]
-	return
-}
-
-func (fs *fileSystems) Register(vfs VFileSystem) {
-	fs.mutex.Lock()
-	fs.mutex.Unlock()
-	for _, s := range vfs.Schemes() {
-		fs.fileSystems[s] = vfs
-	}
-}
-
-func (fs *fileSystems) getFsFor(src *url.URL) (vfs VFileSystem, err error) {
-	var ok bool
-	vfs, ok = fs.fileSystems[src.Scheme]
-	if !ok {
-		err = errutils.FmtError("Unsupported scheme %s for in the url %s", src.Scheme, src.String())
-	}
-	return
-}
 func (fs *fileSystems) Walk(url *url.URL, fn WalkFn) (err error) {
 	var vfs VFileSystem
 	vfs, err = fs.getFsFor(url)
@@ -246,25 +222,51 @@ func (fs *fileSystems) Find(url *url.URL, filter FileFilter) (files []VFile, err
 	return
 }
 
-func (fs *fileSystems) DeleteMatching(url *url.URL, filter FileFilter) (err error) {
-	var vfs VFileSystem
-	vfs, err = fs.getFsFor(url)
-	if err == nil {
-		err = vfs.DeleteMatching(url, filter)
+func (fs *fileSystems) Schemes() (schemes []string) {
+	for k := range fs.fileSystems {
+		if k == "" {
+			continue
+		}
+		schemes = append(schemes, k)
+	}
+	return
+}
+
+func (fs *fileSystems) IsSupported(scheme string) (supported bool) {
+	_, supported = fs.fileSystems[scheme]
+	return
+}
+
+func (fs *fileSystems) getFsFor(src *url.URL) (vfs VFileSystem, err error) {
+	var ok bool
+	vfs, ok = fs.fileSystems[src.Scheme]
+	if !ok {
+		err = errutils.FmtError("Unsupported scheme %s for in the url %s", src.Scheme, src.String())
 	}
 	return
 }
 
 func init() {
 	manager = &fileSystems{}
-	localFs := &OsFs{}
+	localFs := newOsFs()
 	manager.Register(localFs)
 }
 
-func GetManager() VFileSystem {
-	return manager
+func newOsFs() VFileSystem {
+	return &OsFs{BaseVFS: &BaseVFS{VFileSystem: &OsFs{}}}
 }
 
-func Register(fs VFileSystem) {
-	manager.Register(fs)
+func (fs *fileSystems) Register(vfs VFileSystem) {
+	fs.mutex.Lock()
+	fs.mutex.Unlock()
+	for _, s := range vfs.Schemes() {
+		if fs.fileSystems == nil {
+			fs.fileSystems = make(map[string]VFileSystem)
+		}
+		fs.fileSystems[s] = vfs
+	}
+}
+
+func GetManager() Manager {
+	return manager
 }

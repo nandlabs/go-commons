@@ -17,3 +17,5 @@
 .idea
 
 dummy.go
+
+./vfs/tests
