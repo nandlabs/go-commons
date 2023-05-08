@@ -13,7 +13,7 @@ func TestGetManager(t *testing.T) {
 		{
 			name: "localFs",
 			want: &fileSystems{
-				fileSystems: map[string]VFileSystem{"file": &OsFs{}, "": &OsFs{}},
+				fileSystems: map[string]VFileSystem{"file": &OsFs{BaseVFS: &BaseVFS{VFileSystem: &OsFs{}}}, "": &OsFs{BaseVFS: &BaseVFS{VFileSystem: &OsFs{}}}},
 			},
 		},
 	}

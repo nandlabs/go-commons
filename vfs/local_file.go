@@ -1,6 +1,7 @@
 package vfs
 
 import (
+	"fmt"
 	"io/fs"
 	"io/ioutil"
 	"net/url"
@@ -81,7 +82,9 @@ func (o *OsFile) Info() (VFileInfo, error) {
 
 func (o *OsFile) Parent() (file VFile, err error) {
 	var fileInfos []fs.FileInfo
+	fmt.Println(o.Location.Path)
 	fileInfos, err = ioutil.ReadDir(o.Location.Path)
+	fmt.Println(fileInfos)
 	if err == nil {
 		for _, info := range fileInfos {
 			var f *os.File

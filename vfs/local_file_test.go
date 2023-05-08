@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"os"
 	"testing"
+	"time"
 )
 
 func GetParsedUrl(input string) (output *url.URL) {
@@ -23,11 +24,24 @@ func GetRawPath(input string) (output string) {
 	return
 }
 
-var testLocalFsObj = &OsFs{BaseVFS: &BaseVFS{VFileSystem: &OsFs{}}}
+var (
+	testManager = GetManager()
+)
+
+func init() {
+	for {
+		testManager = GetManager()
+		if testManager == nil {
+			time.Sleep(100 * time.Millisecond)
+		} else {
+			break
+		}
+	}
+}
 
 func TestOsFs_Mkdir(t *testing.T) {
 	u := GetRawPath("file:///test-data")
-	_, err := testLocalFsObj.MkdirRaw(u)
+	_, err := testManager.MkdirRaw(u)
 	if err != nil {
 		t.Errorf("MkdirRaw() error = %v", err)
 	}
@@ -35,7 +49,7 @@ func TestOsFs_Mkdir(t *testing.T) {
 
 func TestOsFs_MkdirAll(t *testing.T) {
 	u := GetRawPath("file:///test-data/raw-folder")
-	_, err := testLocalFsObj.MkdirAllRaw(u)
+	_, err := testManager.MkdirAllRaw(u)
 	if err != nil {
 		t.Errorf("MkdirAllRaw() error = %v", err)
 	}
@@ -43,7 +57,7 @@ func TestOsFs_MkdirAll(t *testing.T) {
 
 func TestOsFs_Create(t *testing.T) {
 	u := GetRawPath("file:///test-data/testFile.txt")
-	createdFile, err := testLocalFsObj.CreateRaw(u)
+	createdFile, err := testManager.CreateRaw(u)
 	if err != nil {
 		t.Errorf("Create() error = %v", err)
 	}
@@ -88,7 +102,7 @@ func TestOsFs_Create(t *testing.T) {
 
 func TestOsFs_Open(t *testing.T) {
 	u := GetRawPath("file:///test-data/testFile.txt")
-	openedFile, err := testLocalFsObj.OpenRaw(u)
+	openedFile, err := testManager.OpenRaw(u)
 	defer openedFile.Close()
 
 	b1 := make([]byte, 5)
@@ -115,7 +129,7 @@ func TestOsFs_Open(t *testing.T) {
 
 func TestOsFile_Delete(t *testing.T) {
 	u := GetParsedUrl("file:///test-data/dummyFile.txt")
-	createdFile, err := testLocalFsObj.Create(u)
+	createdFile, err := testManager.Create(u)
 	if err != nil {
 		t.Errorf("Create() error = %v", err)
 	}
@@ -125,26 +139,10 @@ func TestOsFile_Delete(t *testing.T) {
 	}
 }
 
-// TODO : not able to see how to test Parent()
-//func TestOsFile_Parent(t *testing.T) {
-//	u := GetParsedUrl("file:///test-data")
-//	testFilObj := &OsFile{
-//		BaseFile: nil,
-//		file:     nil,
-//		Location: u,
-//		fs:       nil,
-//	}
-//	_, err := testFilObj.Parent()
-//	if err != nil {
-//		t.Errorf("Parent() error = %v", err)
-//	}
-//}
-
 func TestBaseVFS_CopyRaw(t *testing.T) {
 	src := GetRawPath("file:///test-data/testFile.txt")
 	dest := GetRawPath("file:///test-data/testFile-copy.txt")
-
-	err := testLocalFsObj.CopyRaw(src, dest)
+	err := testManager.CopyRaw(src, dest)
 	if err != nil {
 		t.Errorf("CopyRaw() error = %v", err)
 	}
@@ -154,7 +152,7 @@ func TestBaseVFS_MoveRaw(t *testing.T) {
 	src := GetRawPath("file:///test-data/testFile.txt")
 	dest := GetRawPath("file:///test-data/testFile-move.txt")
 
-	err := testLocalFsObj.MoveRaw(src, dest)
+	err := testManager.MoveRaw(src, dest)
 	if err != nil {
 		t.Errorf("MoveRaw() error = %v", err)
 	}
@@ -162,7 +160,7 @@ func TestBaseVFS_MoveRaw(t *testing.T) {
 
 func TestBaseVFS_Find(t *testing.T) {
 	u := GetParsedUrl("file:///test-data/filterFile.txt")
-	_, err := testLocalFsObj.Create(u)
+	_, err := testManager.Create(u)
 	if err != nil {
 		t.Errorf("Create() error = %v", err)
 	}
@@ -180,14 +178,14 @@ func TestBaseVFS_Find(t *testing.T) {
 		return
 	}
 	u2 := GetParsedUrl("file:///test-data")
-	files, err := testLocalFsObj.Find(u2, filterFunc)
+	files, err := testManager.Find(u2, filterFunc)
 	// TODO : filter func not implemented completely due to issue with ListAll()
 	fmt.Println(len(files))
 }
 
 func TestOsFs_Delete(t *testing.T) {
 	u := GetRawPath("file:///test-data")
-	err := testLocalFsObj.DeleteRaw(u)
+	err := testManager.DeleteRaw(u)
 	if err != nil {
 		t.Errorf("DeleteRaw() error = %v", err)
 	}

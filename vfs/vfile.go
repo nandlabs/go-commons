@@ -16,8 +16,9 @@ type VFile interface {
 	VFileContent
 	//ListAll children of this file instance. can be nil in case of file object instead of directory
 	ListAll() ([]VFile, error)
-	//Delete the file object. If the file type is directory all  files and subdirectories will be deleted
+	//Delete the file object. If the file type is directory all files and subdirectories will be deleted
 	Delete() error
+	//DeleteAll deletes all the files and it's subdirectories
 	DeleteAll() error
 	//Info  Get the file ifo
 	Info() (VFileInfo, error)

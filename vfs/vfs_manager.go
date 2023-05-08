@@ -248,8 +248,12 @@ func (fs *fileSystems) getFsFor(src *url.URL) (vfs VFileSystem, err error) {
 
 func init() {
 	manager = &fileSystems{}
-	localFs := &OsFs{}
+	localFs := newOsFs()
 	manager.Register(localFs)
+}
+
+func newOsFs() VFileSystem {
+	return &OsFs{BaseVFS: &BaseVFS{VFileSystem: &OsFs{}}}
 }
 
 func (fs *fileSystems) Register(vfs VFileSystem) {
@@ -263,11 +267,6 @@ func (fs *fileSystems) Register(vfs VFileSystem) {
 	}
 }
 
-// TODO : shouldn't it return Manager instead of VFileSystem?
 func GetManager() Manager {
 	return manager
-}
-
-func Register(fs VFileSystem) {
-	manager.Register(fs)
 }
