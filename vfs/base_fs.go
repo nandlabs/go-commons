@@ -1,7 +1,6 @@
 package vfs
 
 import (
-	"fmt"
 	"io"
 	"net/url"
 
@@ -185,12 +184,10 @@ func (b *BaseVFS) Walk(u *url.URL, fn WalkFn) (err error) {
 		if err == nil {
 			if srcFi.IsDir() {
 				children, err = src.ListAll()
-				fmt.Println(children)
 				if err == nil {
 					for _, child := range children {
 						childInfo, err = child.Info()
 						if err == nil {
-
 							if childInfo.IsDir() {
 								err = b.Walk(child.Url(), fn)
 							} else {
