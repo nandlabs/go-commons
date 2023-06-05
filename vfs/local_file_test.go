@@ -167,7 +167,6 @@ func TestBaseVFS_Find(t *testing.T) {
 	filterFunc := func(createdFile VFile) (result bool, err error) {
 		var fileInfo VFileInfo
 		result = false
-
 		fileInfo, err = createdFile.Info()
 		if err != nil {
 			return
@@ -179,8 +178,24 @@ func TestBaseVFS_Find(t *testing.T) {
 	}
 	u2 := GetParsedUrl("file:///test-data")
 	files, err := testManager.Find(u2, filterFunc)
-	// TODO : filter func not implemented completely due to issue with ListAll()
-	fmt.Println(len(files))
+	if len(files) != 1 {
+		t.Errorf("Files not found = %v", err)
+	}
+}
+
+func TestOsFile_ListAll(t *testing.T) {
+	u := GetParsedUrl("file:///test-data/raw-folder/listFile-2.txt")
+	_, _ = testManager.Create(u)
+
+	u = GetParsedUrl("file:///test-data")
+	output, err := testManager.List(u)
+	if err != nil {
+		t.Errorf("Error listing files = %v", err)
+	}
+	for _, item := range output {
+		fileInfo, _ := item.Info()
+		fmt.Println(fileInfo.Name())
+	}
 }
 
 func TestOsFs_Delete(t *testing.T) {

@@ -1,15 +1,14 @@
 package vfs
 
 import (
-	"fmt"
 	"io/fs"
 	"io/ioutil"
 	"net/url"
 	"os"
+	"path/filepath"
 
 	"go.nandlabs.io/commons/errutils"
 	"go.nandlabs.io/commons/fsutils"
-	"go.nandlabs.io/commons/textutils"
 )
 
 type OsFile struct {
@@ -40,32 +39,27 @@ func (o *OsFile) ContentType() string {
 }
 
 func (o *OsFile) ListAll() (files []VFile, err error) {
-	var fis []fs.FileInfo
 	manager := GetManager()
-	fis, err = ioutil.ReadDir(o.Location.Path)
+	var children []VFile
+	err = filepath.WalkDir(o.Location.Path, visit(manager, &children))
 	if err == nil {
-		var children []VFile
-		var child VFile
-		var childUrl *url.URL
-		for _, fi := range fis {
-			// TODO : in case of nested folder structure, does this work?
-			childUrl, err = o.Location.Parse(textutils.ForwardSlashStr + fi.Name())
-			if err == nil {
-				child, err = manager.Open(childUrl)
-				if err == nil {
-					children = append(children, child)
-				} else {
-					break
-				}
-			} else {
-				break
-			}
-		}
-		if err == nil {
-			files = children
-		}
+		files = children
 	}
 	return
+}
+
+func visit(manager Manager, paths *[]VFile) func(string, os.DirEntry, error) (err error) {
+	return func(path string, info os.DirEntry, err2 error) (err error) {
+		if err2 != nil {
+			return
+		}
+		if !info.IsDir() {
+			var child VFile
+			child, err = manager.OpenRaw(path)
+			*paths = append(*paths, child)
+		}
+		return
+	}
 }
 
 func (o *OsFile) Delete() error {
@@ -82,9 +76,7 @@ func (o *OsFile) Info() (VFileInfo, error) {
 
 func (o *OsFile) Parent() (file VFile, err error) {
 	var fileInfos []fs.FileInfo
-	fmt.Println(o.Location.Path)
 	fileInfos, err = ioutil.ReadDir(o.Location.Path)
-	fmt.Println(fileInfos)
 	if err == nil {
 		for _, info := range fileInfos {
 			var f *os.File
