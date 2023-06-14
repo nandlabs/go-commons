@@ -1,12 +1,12 @@
 package messaging
 
 type Producer interface {
-	Send(string, Message) error
-	SendBatch(string, ...Message) error
+	Send(string, LocalMessage) error
+	SendBatch(string, ...LocalMessage) error
 }
 
 type Consumer interface {
-	// TODO :: function as parameter execution on success or error
+	// TODO :: function execution on success or error
 	OnMessage() error
 }
 

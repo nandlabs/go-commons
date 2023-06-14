@@ -11,11 +11,11 @@ type messagingSystems struct {
 	messagingSystems map[string]Messaging
 }
 
-func (ms *messagingSystems) Send(destination string, msg Message) error {
+func (ms *messagingSystems) Send(destination string, msg LocalMessage) error {
 	return nil
 }
 
-func (ms *messagingSystems) SendBatch(destination string, msg ...Message) error {
+func (ms *messagingSystems) SendBatch(destination string, msg ...LocalMessage) error {
 	return nil
 }
 
@@ -40,7 +40,7 @@ func init() {
 }
 
 func newLocalMessagingSystem() (msg Messaging) {
-
+	return &LocalMessagingSystem{}
 }
 
 func (ms *messagingSystems) Register(messaging Messaging) {
