@@ -2,9 +2,10 @@ package messaging
 
 import (
 	"bytes"
-	"go.nandlabs.io/commons/codec"
 	"io"
 	"reflect"
+
+	"go.nandlabs.io/commons/codec"
 )
 
 type LocalMessage struct {
