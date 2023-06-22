@@ -1,6 +1,8 @@
 package messaging
 
 import (
+	"go.nandlabs.io/commons/errutils"
+	"net/url"
 	"sync"
 )
 
@@ -11,16 +13,31 @@ type messagingSystems struct {
 	messagingSystems map[string]Messaging
 }
 
-func (ms *messagingSystems) Send(destination string, msg LocalMessage) error {
-	return nil
+func (ms *messagingSystems) Send(destination *url.URL, msg *Message) (err error) {
+	var messaging Messaging
+	messaging, err = ms.getMsFor(destination)
+	if err == nil {
+		err = messaging.Send(destination, msg)
+	}
+	return
 }
 
-func (ms *messagingSystems) SendBatch(destination string, msg ...LocalMessage) error {
-	return nil
+func (ms *messagingSystems) SendBatch(destination *url.URL, msg ...*Message) (err error) {
+	var messaging Messaging
+	messaging, err = ms.getMsFor(destination)
+	if err == nil {
+		err = messaging.SendBatch(destination, msg...)
+	}
+	return
 }
 
-func (ms *messagingSystems) OnMessage() error {
-	return nil
+func (ms *messagingSystems) OnMessage(source *url.URL, onConsume ConsumeMessage) (err error) {
+	var messaging Messaging
+	messaging, err = ms.getMsFor(source)
+	if err == nil {
+		err = messaging.OnMessage(source, onConsume)
+	}
+	return
 }
 
 func (ms *messagingSystems) Schemes() (schemes []string) {
@@ -33,13 +50,27 @@ func (ms *messagingSystems) Schemes() (schemes []string) {
 	return
 }
 
+func (ms *messagingSystems) IsSupported(scheme string) (supported bool) {
+	_, supported = ms.messagingSystems[scheme]
+	return
+}
+
+func (ms *messagingSystems) getMsFor(src *url.URL) (msg Messaging, err error) {
+	var ok bool
+	msg, ok = ms.messagingSystems[src.Scheme]
+	if !ok {
+		err = errutils.FmtError("Unsupported messaging scheme %s for in the url %s", src.Scheme, src.String())
+	}
+	return
+}
+
 func init() {
-	manager := &messagingSystems{}
+	manager = &messagingSystems{}
 	localMs := newLocalMessagingSystem()
 	manager.Register(localMs)
 }
 
-func newLocalMessagingSystem() (msg Messaging) {
+func newLocalMessagingSystem() (msg *LocalMessagingSystem) {
 	return &LocalMessagingSystem{}
 }
 

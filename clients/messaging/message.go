@@ -78,5 +78,6 @@ type Body interface {
 type Message interface {
 	Header
 	Body
+	// TODO :: do we need this?
 	io.ReadWriter
 }

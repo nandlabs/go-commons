@@ -206,3 +206,13 @@ func (lm *LocalMessage) GetFloat64Header(key string) (value float64, exists bool
 	}
 	return
 }
+
+func (lm *LocalMessage) Read(p []byte) (n int, err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (lm *LocalMessage) Write(p []byte) (n int, err error) {
+	//TODO implement me
+	panic("implement me")
+}

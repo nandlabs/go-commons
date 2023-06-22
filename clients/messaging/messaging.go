@@ -1,13 +1,16 @@
 package messaging
 
+import "net/url"
+
 type Producer interface {
-	Send(string, LocalMessage) error
-	SendBatch(string, ...LocalMessage) error
+	Send(*url.URL, *Message) error
+	SendBatch(*url.URL, ...*Message) error
 }
 
+type ConsumeMessage func(msg *Message) error
+
 type Consumer interface {
-	// TODO :: function execution on success or error
-	OnMessage() error
+	OnMessage(*url.URL, ConsumeMessage) error
 }
 
 type Messaging interface {
