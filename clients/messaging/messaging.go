@@ -3,11 +3,11 @@ package messaging
 import "net/url"
 
 type Producer interface {
-	Send(*url.URL, *Message) error
-	SendBatch(*url.URL, ...*Message) error
+	Send(*url.URL, Message) error
+	SendBatch(*url.URL, ...Message) error
 }
 
-type ConsumeMessage func(msg *Message) error
+type ConsumeMessage func(msg Message) error
 
 type Consumer interface {
 	OnMessage(*url.URL, ConsumeMessage) error

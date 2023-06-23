@@ -1,22 +1,26 @@
 package messaging
 
-import "net/url"
+import (
+	"net/url"
+)
 
 var (
 	localMessagingSchemes = []string{"chan"}
-	localMsgChannel       = make(chan *Message)
+	localMsgChannel       = make(chan Message)
 )
 
 type LocalMessagingSystem struct {
 	LocalMessage
 }
 
-func (lms *LocalMessagingSystem) Send(_ *url.URL, msg *Message) error {
-	localMsgChannel <- msg
+func (lms *LocalMessagingSystem) Send(_ *url.URL, msg Message) error {
+	go func() {
+		localMsgChannel <- msg
+	}()
 	return nil
 }
 
-func (lms *LocalMessagingSystem) SendBatch(_ *url.URL, messages ...*Message) error {
+func (lms *LocalMessagingSystem) SendBatch(_ *url.URL, messages ...Message) error {
 	for _, message := range messages {
 		localMsgChannel <- message
 	}

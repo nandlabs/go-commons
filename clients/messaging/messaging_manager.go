@@ -13,16 +13,17 @@ type messagingSystems struct {
 	messagingSystems map[string]Messaging
 }
 
-func (ms *messagingSystems) Send(destination *url.URL, msg *Message) (err error) {
+func (ms *messagingSystems) Send(destination *url.URL, msg Message) (err error) {
 	var messaging Messaging
 	messaging, err = ms.getMsFor(destination)
+
 	if err == nil {
 		err = messaging.Send(destination, msg)
 	}
 	return
 }
 
-func (ms *messagingSystems) SendBatch(destination *url.URL, msg ...*Message) (err error) {
+func (ms *messagingSystems) SendBatch(destination *url.URL, msg ...Message) (err error) {
 	var messaging Messaging
 	messaging, err = ms.getMsFor(destination)
 	if err == nil {
@@ -59,7 +60,7 @@ func (ms *messagingSystems) getMsFor(src *url.URL) (msg Messaging, err error) {
 	var ok bool
 	msg, ok = ms.messagingSystems[src.Scheme]
 	if !ok {
-		err = errutils.FmtError("Unsupported messaging scheme %s for in the url %s", src.Scheme, src.String())
+		err = errutils.FmtError("unsupported messaging scheme %s for in the url %s", src.Scheme, src.String())
 	}
 	return
 }
