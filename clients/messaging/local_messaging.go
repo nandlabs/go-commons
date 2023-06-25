@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"fmt"
 	"net/url"
 )
 
@@ -13,22 +14,26 @@ type LocalMessagingSystem struct {
 	LocalMessage
 }
 
-func (lms *LocalMessagingSystem) Send(_ *url.URL, msg Message) error {
+func (lms *LocalMessagingSystem) Send(_ *url.URL, msg Message) (err error) {
 	go func() {
 		localMsgChannel <- msg
 	}()
-	return nil
+	return
 }
 
-func (lms *LocalMessagingSystem) SendBatch(_ *url.URL, messages ...Message) error {
+func (lms *LocalMessagingSystem) SendBatch(destination *url.URL, messages ...Message) (err error) {
 	for _, message := range messages {
-		localMsgChannel <- message
+		err = lms.Send(destination, message)
+		if err != nil {
+			return
+		}
 	}
-	return nil
+	return
 }
 
-func (lms *LocalMessagingSystem) OnMessage(source *url.URL, onConsume ConsumeMessage) (err error) {
+func (lms *LocalMessagingSystem) OnMessage(_ *url.URL, onConsume ConsumeMessage) (err error) {
 	for msg := range localMsgChannel {
+		fmt.Println(msg)
 		err = onConsume(msg)
 		if err != nil {
 			return

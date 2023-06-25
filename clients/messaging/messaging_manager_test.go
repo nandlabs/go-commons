@@ -14,7 +14,6 @@ func TestGetMessagingManager(t *testing.T) {
 		name string
 		want ManagerMessaging
 	}{
-		// TODO: Add test cases.
 		{
 			name: "Test_1",
 			want: &messagingSystems{

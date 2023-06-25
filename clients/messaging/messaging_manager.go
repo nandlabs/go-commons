@@ -16,7 +16,6 @@ type messagingSystems struct {
 func (ms *messagingSystems) Send(destination *url.URL, msg Message) (err error) {
 	var messaging Messaging
 	messaging, err = ms.getMsFor(destination)
-
 	if err == nil {
 		err = messaging.Send(destination, msg)
 	}
