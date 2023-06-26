@@ -6,6 +6,8 @@ import (
 
 // Header defines all the header interfaces required by the messaging clients
 type Header interface {
+	// SetHeader sets the byte header value for the Message header
+	SetHeader(key string, value []byte)
 	// SetStrHeader sets the string header value for the Message header
 	SetStrHeader(key string, value string)
 	// SetBoolHeader sets the boolean header value for the Message header
@@ -25,6 +27,8 @@ type Header interface {
 	// SetFloat64Header sets the float64 header value for the Message header
 	SetFloat64Header(key string, value float64)
 
+	// GetHeader returns the value of the key set in the headers if exists in the byte[] value
+	GetHeader(key string) (value []byte, exists bool)
 	// GetStrHeader returns the value of the key set in the headers if exists in the string value
 	GetStrHeader(key string) (value string, exists bool)
 	// GetBoolHeader returns the value of the key set in the headers if exists in the bool value
@@ -62,8 +66,8 @@ type Body interface {
 
 	// ReadBody reads the Reader body from the Message structure
 	ReadBody() io.Reader
-	// ReadAsByte reads the []byte body from the Message structure
-	ReadAsByte() []byte
+	// ReadBytes reads the []byte body from the Message structure
+	ReadBytes() []byte
 	// ReadAsStr reads the string body from the Message structure
 	ReadAsStr() string
 	// ReadJSON reads the JSON body from the Message structure
@@ -78,6 +82,4 @@ type Body interface {
 type Message interface {
 	Header
 	Body
-	// TODO :: do we need this?
-	io.ReadWriter
 }

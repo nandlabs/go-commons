@@ -18,7 +18,7 @@ func TestLocalMessage_SetBodyBytes(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error SetBodyBytes: %v", err)
 	}
-	res := message.ReadAsByte()
+	res := message.ReadBytes()
 	if string(res) != string(input) {
 		t.Errorf("Error ReadAsStr, want= %v, got= %v", input, res)
 	}

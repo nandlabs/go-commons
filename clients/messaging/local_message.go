@@ -53,7 +53,7 @@ func (lm *LocalMessage) ReadBody() io.Reader {
 	return lm.body
 }
 
-func (lm *LocalMessage) ReadAsByte() []byte {
+func (lm *LocalMessage) ReadBytes() []byte {
 	return lm.body.Bytes()
 }
 
@@ -79,6 +79,11 @@ func (lm *LocalMessage) ReadContent(out interface{}, contentType string) (err er
 		err = cdc.Read(lm.body, out)
 	}
 	return
+}
+
+func (lm *LocalMessage) SetHeader(key string, value []byte) {
+	lm.headers[key] = value
+	lm.headerTypes[key] = reflect.Array
 }
 
 func (lm *LocalMessage) SetStrHeader(key string, value string) {
@@ -124,6 +129,15 @@ func (lm *LocalMessage) SetFloatHeader(key string, value float32) {
 func (lm *LocalMessage) SetFloat64Header(key string, value float64) {
 	lm.headers[key] = value
 	lm.headerTypes[key] = reflect.Float64
+}
+
+func (lm *LocalMessage) GetHeader(key string) (value []byte, exists bool) {
+	var v interface{}
+	v, exists = lm.headers[key]
+	if exists {
+		value = v.([]byte)
+	}
+	return
 }
 
 func (lm *LocalMessage) GetStrHeader(key string) (value string, exists bool) {
@@ -205,14 +219,4 @@ func (lm *LocalMessage) GetFloat64Header(key string) (value float64, exists bool
 		value = v.(float64)
 	}
 	return
-}
-
-func (lm *LocalMessage) Read(p []byte) (n int, err error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (lm *LocalMessage) Write(p []byte) (n int, err error) {
-	//TODO implement me
-	panic("implement me")
 }
