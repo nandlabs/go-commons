@@ -9,14 +9,14 @@ var (
 	localMsgChannel = make(chan Message)
 )
 
-// LocalProvider is an implementation of the Provider interface
-type LocalProvider struct{}
+// localProvider is an implementation of the Provider interface
+type localProvider struct{}
 
-func (lp *LocalProvider) AddListener(url *url.URL, listener func(msg Message)) (err error) {
+func (lp *localProvider) AddListener(url *url.URL, listener func(msg Message)) (err error) {
 	return
 }
 
-func (lp *LocalProvider) Send(url *url.URL, msg Message) (err error) {
+func (lp *localProvider) Send(url *url.URL, msg Message) (err error) {
 	if url.Scheme != "chan" {
 		err = errors.New("invalid provider url " + url.String())
 	}
@@ -26,7 +26,7 @@ func (lp *LocalProvider) Send(url *url.URL, msg Message) (err error) {
 	return
 }
 
-func (lp *LocalProvider) SendBatch(url *url.URL, msgs ...Message) (err error) {
+func (lp *localProvider) SendBatch(url *url.URL, msgs ...Message) (err error) {
 	if url.Scheme != "chan" {
 		err = errors.New("invalid provider url " + url.String())
 	}
@@ -39,7 +39,7 @@ func (lp *LocalProvider) SendBatch(url *url.URL, msgs ...Message) (err error) {
 	return
 }
 
-func (lp *LocalProvider) Receive(url *url.URL) (msg Message, err error) {
+func (lp *localProvider) Receive(url *url.URL) (msg Message, err error) {
 	if url.Scheme != "chan" {
 		err = errors.New("invalid provider url " + url.String())
 	}
@@ -49,7 +49,7 @@ func (lp *LocalProvider) Receive(url *url.URL) (msg Message, err error) {
 	return
 }
 
-func (lp *LocalProvider) ReceiveBatch(url *url.URL) (msgs []Message, err error) {
+func (lp *localProvider) ReceiveBatch(url *url.URL) (msgs []Message, err error) {
 	if url.Scheme != "chan" {
 		err = errors.New("invalid provider url " + url.String())
 	}
@@ -59,15 +59,15 @@ func (lp *LocalProvider) ReceiveBatch(url *url.URL) (msgs []Message, err error) 
 	return
 }
 
-func (lp *LocalProvider) Setup() {
-	localProvider := &LocalProvider{}
+func (lp *localProvider) Setup() {
+	localProvider := &localProvider{}
 	uri, err := url.Parse("chan://localhost:8080")
-	if err != nil {
+	if err == nil {
 		Register(uri, localProvider)
 	}
 }
 
 func init() {
-	lp := &LocalProvider{}
+	lp := &localProvider{}
 	lp.Setup()
 }

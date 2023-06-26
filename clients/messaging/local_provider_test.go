@@ -8,7 +8,7 @@ import (
 )
 
 func TestLocalMessagingSystem_Send(t *testing.T) {
-	lms := &LocalMessagingSystem{}
+	lms := &Messaging{}
 	msg := &LocalMessage{
 		headers:     make(map[string]interface{}),
 		headerTypes: make(map[string]reflect.Kind),
