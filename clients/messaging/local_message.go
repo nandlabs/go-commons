@@ -41,7 +41,7 @@ func (lm *LocalMessage) WriteXML(input interface{}) (err error) {
 
 func (lm *LocalMessage) WriteContent(input interface{}, contentType string) (err error) {
 	var cdc codec.Codec
-	// TODO: provide options to customise codec options
+	// TODO : provide options to customise codec options
 	cdc, err = codec.GetDefault(contentType)
 	if err == nil {
 		err = cdc.Write(input, lm.body)

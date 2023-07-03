@@ -30,14 +30,15 @@ go get go.nandlabs.io/commons/clients/messaging
 ## Usage
 1. Import the library into your Go project:
     ```go
-    import "github.com/your-repo/generic-messaging-client"
+    import "go.nandlabs.io/commons/clients/messaging"
     ```
-2. Initialize the messaging client for a specific platform. For example, to use the AMQP extension:
+2. Initialize the messaging provider for a specific platform. For example, to use the AMQP extension:
     ```go
-    type AMQPMessaging struct {} // implements the Message interface defined under the library
+    type AMQPProvider struct {} // implements the Provider interface defined under the library
     
-    amqpMessageClient := &AMQPMessaging{}
-    messaging.GetManager().Register(amqpMessageClient)
+    amqpProvider := &AMQPProvider{}
+	  uri, err := url.Parse("amqp://localhost:8080")
+    Register(uri, amqpProvider)
     ```
 3. Send a message
    ```go
@@ -45,24 +46,24 @@ go get go.nandlabs.io/commons/clients/messaging
      Body: []byte("Hello, World!"), 
 	 /// Add any additional properties or metadata
    }
-   amqp := &AMQPMessaging{}
+   amqp := &Messaging{}
    destination := url.Parse("amqp://guest:password@localhost:5672/myvhost")
    err := amqp.Send(destination, message)
    if err != nil {
      // Handle error
    }
    ```
-4. Consume a message
+4. Receive a message
    ```go
-   // Define the onConsume function
-   onConsume := func(msg Message) error {
+   // Define the onReceive function
+   onReceive := func(msg Message) error {
        // Process the message
        // ...
 
     return nil
    }
-   // Start consuming messages from the channel
-   OnMessage(consumerUrl, onConsume)
+   // Start receiving messages from the channel
+   Receive(receiverUrl, onReceive)
    ```
 5. Repeat steps 2-4 for other messaging platforms by initializing the respective clients.
 
