@@ -12,6 +12,9 @@ This is a flexible and extensible messaging client designed to provide a unified
 ## Features
 * General producer interface for sending messages to different messaging platforms.
 * General consumer interface for receiving and processing messages from different messaging platforms.
+* Supports QualityOfService features such as
+  * CircuitBreaker
+  * Retry
 * Easy-to-use message abstraction for consistent handling of messages across platforms.
 * Can be extended to multiple messaging platforms with easily pluggable interfaces, including:
   * AMQP (Advanced Message Queuing Protocol)
@@ -46,7 +49,7 @@ go get go.nandlabs.io/commons/clients/messaging
      Body: []byte("Hello, World!"), 
 	 /// Add any additional properties or metadata
    }
-   amqp := &Messaging{}
+   amqp := NewMessaging()
    destination := url.Parse("amqp://guest:password@localhost:5672/myvhost")
    err := amqp.Send(destination, message)
    if err != nil {

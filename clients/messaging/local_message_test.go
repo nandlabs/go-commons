@@ -54,7 +54,7 @@ func TestLocalMessage_SetFrom(t *testing.T) {
 	}
 	res := message.ReadBody()
 	b1 := make([]byte, 2)
-	r1, err := res.Read(b1)
+	r1, _ := res.Read(b1)
 	if r1 != len(b1) {
 		t.Error("Error SetFrom")
 	}
