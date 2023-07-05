@@ -78,8 +78,16 @@ type Body interface {
 	ReadContent(out interface{}, contentType string) error
 }
 
-// Message interface wil be implemented by all third party implementation such as aws - sns, sqs, gcp -> pub/sub, gcm, messaging -> amqp, kafka
+// Message interface wil be implemented by all third party implementation such as
+//aws - sns, sqs,
+//gcp -> pub/sub, gcm,
+//messaging -> amqp, kafka
 type Message interface {
 	Header
 	Body
+	// Rsvp function provides a facade to acknowledge the message to the provider indicating the acceptance or rejection
+	//as mentioned by the first bool parameter.
+	//Additional options can be set for indicating further actions.
+	//This functionality is purely dependent on the capability of the provider to accept an acknowledgement.
+	Rsvp(bool, ...Option) error
 }

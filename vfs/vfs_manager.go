@@ -258,7 +258,7 @@ func newOsFs() VFileSystem {
 
 func (fs *fileSystems) Register(vfs VFileSystem) {
 	fs.mutex.Lock()
-	fs.mutex.Unlock()
+	defer fs.mutex.Unlock()
 	for _, s := range vfs.Schemes() {
 		if fs.fileSystems == nil {
 			fs.fileSystems = make(map[string]VFileSystem)
