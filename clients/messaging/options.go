@@ -31,13 +31,12 @@ func NewOptionsResolver(options ...Option) (optsResolver *OptionsResolver) {
 	return
 }
 
-//TODO check if we can pool this for performance
+// TODO check if we can pool this for performance
 func NewOptionsBuilder() *OptionsBuilder {
 	return &OptionsBuilder{}
 }
 
-//TODO check if you need to pool this for performance
-
+// TODO check if you need to pool this for performance
 func (ob *OptionsBuilder) Add(key string, value interface{}) *OptionsBuilder {
 	ob.options = append(ob.options, Option{
 		Key:   key,

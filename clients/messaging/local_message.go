@@ -23,3 +23,5 @@ func (lm *LocalMessage) Rsvp(yes bool, options ...Option) (err error) {
 	// Local message does not support RSVP
 	return
 }
+
+// multiple endpoint support support

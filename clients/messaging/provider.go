@@ -1,14 +1,15 @@
 package messaging
 
 import (
-	"go.nandlabs.io/commons/errutils"
 	"net/url"
 	"sync"
+
+	"go.nandlabs.io/commons/errutils"
 )
 
 var facade Messaging
 
-//Producer interface is used to send message(s) to a specific provider
+// Producer interface is used to send message(s) to a specific provider
 type Producer interface {
 	// Send function sends an individual message to the url
 	Send(*url.URL, Message, ...Option) error
@@ -16,7 +17,7 @@ type Producer interface {
 	SendBatch(*url.URL, []Message, ...Option) error
 }
 
-//Receiver interface provides the functions for receiving a message(s)
+// Receiver interface provides the functions for receiving a message(s)
 type Receiver interface {
 	// Receive function performs on-demand receive of a single message.
 	//This function may or may not wait for the messages to arrive. This is purely dependent on the implementation.
@@ -110,7 +111,8 @@ func (m *Manager) Schemes() (schemes []string) {
 		if k == "" {
 			continue
 		}
-		schemes = append(schemes, k)
+		provider := m.knownProviders[k]
+		schemes = provider.Schemes()
 	}
 	return
 }
@@ -126,8 +128,15 @@ func (m *Manager) NewMessage(scheme string, options ...Option) (msg Message, err
 
 func (m *Manager) Setup() {
 	//TODO The facade setup will register the local provider
-
+	localProvider := &LocalProvider{}
+	// perform initial setup of local provider
+	localProvider.Setup()
+	m.Register(localProvider)
 }
+
+//func (m *Manager) AddDefaultOptions() Messaging {
+//	// TODO
+//}
 
 func Get() Messaging {
 	return facade
