@@ -38,10 +38,10 @@ go get go.nandlabs.io/commons/clients/messaging
 2. Initialize the messaging provider for a specific platform. For example, to use the AMQP extension:
     ```go
     type AMQPProvider struct {} // implements the Provider interface defined under the library
-    
     amqpProvider := &AMQPProvider{}
-	  uri, err := url.Parse("amqp://localhost:8080")
-    Register(uri, amqpProvider)
+   
+    manager := messaging.Get()
+    manager.Register(amqpProvider)
     ```
 3. Send a message
    ```go
@@ -49,9 +49,8 @@ go get go.nandlabs.io/commons/clients/messaging
      Body: []byte("Hello, World!"), 
 	 /// Add any additional properties or metadata
    }
-   amqp := NewMessaging()
    destination := url.Parse("amqp://guest:password@localhost:5672/myvhost")
-   err := amqp.Send(destination, message)
+   err := manager.Send(destination, message)
    if err != nil {
      // Handle error
    }
@@ -66,7 +65,7 @@ go get go.nandlabs.io/commons/clients/messaging
     return nil
    }
    // Start receiving messages from the channel
-   Receive(receiverUrl, onReceive)
+   manager.Receive(receiverUrl, onReceive)
    ```
 5. Repeat steps 2-4 for other messaging platforms by initializing the respective clients.
 

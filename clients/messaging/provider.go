@@ -111,8 +111,7 @@ func (m *Manager) Schemes() (schemes []string) {
 		if k == "" {
 			continue
 		}
-		provider := m.knownProviders[k]
-		schemes = provider.Schemes()
+		schemes = append(schemes, k)
 	}
 	return
 }

@@ -1,7 +1,6 @@
 package messaging
 
 import (
-	"errors"
 	"net/url"
 	"sync"
 )
@@ -29,27 +28,14 @@ func (lp *LocalProvider) getChan(url *url.URL) (result chan Message) {
 	if !ok {
 		lp.mutex.Lock()
 		defer lp.mutex.Unlock()
-		var localMsgChannel = make(chan Message)
+		localMsgChannel := make(chan Message)
 		lp.local[url] = localMsgChannel
 		result = localMsgChannel
 	}
 	return
 }
 
-func isValidScheme(scheme string) (valid bool) {
-	valid = false
-	for _, v := range localProviderSchemes {
-		if scheme == v {
-			valid = true
-		}
-	}
-	return
-}
-
 func (lp *LocalProvider) Send(url *url.URL, msg Message, options ...Option) (err error) {
-	if isValidScheme(url.Scheme) {
-		err = errors.New("invalid provider url " + url.String())
-	}
 	destination := lp.getChan(url)
 	go func() {
 		destination <- msg
@@ -58,9 +44,6 @@ func (lp *LocalProvider) Send(url *url.URL, msg Message, options ...Option) (err
 }
 
 func (lp *LocalProvider) SendBatch(url *url.URL, msgs []Message, options ...Option) (err error) {
-	if isValidScheme(url.Scheme) {
-		err = errors.New("invalid provider url " + url.String())
-	}
 	for _, message := range msgs {
 		err = lp.Send(url, message)
 		if err != nil {
@@ -71,9 +54,6 @@ func (lp *LocalProvider) SendBatch(url *url.URL, msgs []Message, options ...Opti
 }
 
 func (lp *LocalProvider) Receive(url *url.URL, options ...Option) (msg Message, err error) {
-	if isValidScheme(url.Scheme) {
-		err = errors.New("invalid provider url " + url.String())
-	}
 	receiver := lp.getChan(url)
 	for m := range receiver {
 		msg = m
@@ -82,9 +62,6 @@ func (lp *LocalProvider) Receive(url *url.URL, options ...Option) (msg Message, 
 }
 
 func (lp *LocalProvider) ReceiveBatch(url *url.URL, options ...Option) (msgs []Message, err error) {
-	if isValidScheme(url.Scheme) {
-		err = errors.New("invalid provider url " + url.String())
-	}
 	receiver := lp.getChan(url)
 	for m := range receiver {
 		msgs = append(msgs, m)
@@ -98,7 +75,8 @@ func (lp *LocalProvider) AddListener(url *url.URL, listener func(msg Message), o
 }
 
 func (lp *LocalProvider) Setup() {
-	// TODO LOCAL SETUP
+	lp.mutex = sync.Mutex{}
+	lp.local = make(map[*url.URL]chan Message)
 }
 
 func (lp *LocalProvider) Schemes() (schemes []string) {
