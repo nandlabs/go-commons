@@ -56,7 +56,7 @@ func (m *Manager) getFor(scheme string) (provider Provider, err error) {
 	var ok bool
 	provider, ok = m.knownProviders[scheme]
 	if !ok {
-		err = errutils.FmtError("Unsupported scheme  %s ", scheme)
+		err = errutils.FmtError("Unsupported scheme %s", scheme)
 	}
 	return
 }
