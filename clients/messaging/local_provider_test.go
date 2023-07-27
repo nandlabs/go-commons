@@ -47,3 +47,26 @@ func TestLocalProvider_SendBatch(t *testing.T) {
 		t.Errorf("Error got :: %v", got)
 	}
 }
+
+func TestLocalProvider_AddListener(t *testing.T) {
+	lms := Get()
+	uri, _ := url.Parse("chan://localhost2:8080")
+	input1 := "this is a listener test"
+	go func() {
+		err := lms.AddListener(uri, func(output Message) {
+			if output.ReadAsStr() != input1 {
+				t.Errorf("Error AddListner")
+			}
+		})
+		if err != nil {
+			t.Errorf("Error AddListner")
+		}
+	}()
+
+	msg1, err := lms.NewMessage("chan")
+	_, err = msg1.SetBodyStr(input1)
+	if err != nil {
+		t.Errorf("Error SetBodyStr:: %v", err)
+	}
+	_ = lms.Send(uri, msg1)
+}

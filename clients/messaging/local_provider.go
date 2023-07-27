@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"errors"
 	"net/url"
 	"sync"
 )
@@ -70,8 +71,15 @@ func (lp *LocalProvider) ReceiveBatch(url *url.URL, options ...Option) (msgs []M
 }
 
 func (lp *LocalProvider) AddListener(url *url.URL, listener func(msg Message), options ...Option) (err error) {
-	// TODO
-	return
+	localListener := lp.getChan(url)
+	for {
+		val, ok := <-localListener
+		if !ok {
+			err = errors.New("channel is closed")
+			return
+		}
+		listener(val)
+	}
 }
 
 func (lp *LocalProvider) Setup() {
