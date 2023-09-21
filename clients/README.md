@@ -2,6 +2,13 @@
 
 Go-commons clients is a versatile client library written in Go that provides a unified interface for interacting with various services with the aim of common set of features like circuit breaker and retry handler. It allows you to communicate with different types of services, including REST APIs and messaging systems along using a consistent and easy-to-use interface.
 
+---
+- [Features](#features)
+- [Sub-Clients](#sub-clients)
+- [Getting Started](#getting-started)
+- [Documentation](#documentation)
+---
+
 ### Features
 
 The Generic Golang Client offers the following features:
@@ -28,16 +35,16 @@ To start using the Generic Golang Client, follow these steps:
     ```
 3. Depending on the service you want to interact with, import the relevant sub-client:
    ```go
-    import "go.nandlabs.io/commons/clients/rest"
-    ```
+   import "go.nandlabs.io/commons/clients/rest"
+   ```
    or
    ```go
-    import "go.nandlabs.io/commons/clients/messaging"
-    ```
+   import "go.nandlabs.io/commons/clients/messaging"
+   ```
     You can import multiple sub-clients if needed.
 4. Initialize the sub-client and start using its functionality. Refer to the sub-client's documentation for detailed instructions on how to use it.
 
 ### Documentation
 For detailed information on how to use the Generic Golang Client and its sub-clients, refer to the following documentation:
 * [REST Client](rest/README.md)
-* [Messaging Client]()
+* [Messaging Client](messaging/README.md)

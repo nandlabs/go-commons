@@ -1,6 +1,12 @@
 # REST Client
 This is a README file for a REST client built using the Go programming language. The client provides a simple and efficient way to interact with RESTful APIs in Go.
 
+---
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+---
+
 ## Features
 * HTTP methods: GET, POST, PUT, DELETE
 * Query parameters 
@@ -19,6 +25,7 @@ This is a README file for a REST client built using the Go programming language.
   * ErrorOnHttpStatus : sets the list of status codes that can be considered failures
 
 ## Installation
+To install the REST client, use the following command:
 ```bash
 go get go.nandlabs.io/commons/clients/rest
 ```
