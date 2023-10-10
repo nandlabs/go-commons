@@ -23,13 +23,21 @@ func TestToUpper(t *testing.T) {
 }
 
 func TestConcat(t *testing.T) {
-	s1 := "Hello, "
-	s2 := "World!"
-	expected := "Hello, World!"
-	result := Concat(s1, s2)
+	tests := []struct {
+		inputs   []string
+		expected string
+	}{
+		{[]string{"Hello, ", "World!"}, "Hello, World!"},
+		{[]string{"a", "b"}, "ab"},
+		{[]string{"a", "b", "c"}, "abc"},
+		{[]string{}, ""},
+	}
 
-	if result != expected {
-		t.Errorf("Concat(%s, %s) = %s; expected %s", s1, s2, result, expected)
+	for _, tt := range tests {
+		result := Concat(tt.inputs...)
+		if result != tt.expected {
+			t.Errorf("Concat(%v) = %s; expected %s", tt.inputs, result, tt.expected)
+		}
 	}
 }
 
@@ -126,13 +134,22 @@ func TestSplit(t *testing.T) {
 }
 
 func TestJoin(t *testing.T) {
-	strs := []string{"apple", "banana", "cherry"}
-	separator := ","
-	expected := "apple,banana,cherry"
-	result := Join(strs, separator)
+	tests := []struct {
+		separator string
+		inputs    []string
+		expected  string
+	}{
+		{",", []string{"apple", "banana", "cherry"}, "apple,banana,cherry"},
+		{"-", []string{"a", "b", "c"}, "a-b-c"},
+		{" ", []string{"Hello", "World!"}, "Hello World!"},
+		{"", []string{"a", "b", "c"}, "abc"},
+	}
 
-	if result != expected {
-		t.Errorf("Join(%v, %s) = %s; expected %s", strs, separator, result, expected)
+	for _, tt := range tests {
+		result := Join(tt.separator, tt.inputs...)
+		if result != tt.expected {
+			t.Errorf("Join(%s, %v) = %s; expected %s", tt.separator, tt.inputs, result, tt.expected)
+		}
 	}
 }
 
