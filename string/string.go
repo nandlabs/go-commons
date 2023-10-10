@@ -15,22 +15,22 @@ func ToUpper(s string) string {
 }
 
 // Concat concatenates two strings.
-func Concat(s1, s2 string) string {
-	return s1 + s2
+func Concat(s ...string) string {
+	result := ""
+	for _, str := range s {
+		result += str
+	}
+	return result
 }
 
 // Reverse reverses a string.
 func Reverse(s string) string {
 	// Convert the string to a rune slice to handle Unicode characters correctly
 	runes := []rune(s)
-	length := len(runes)
-	reversed := make([]rune, length)
-
-	for i, j := length-1, 0; i >= 0; i, j = i-1, j+1 {
-		reversed[j] = runes[i]
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
 	}
-
-	return string(reversed)
+	return string(runes)
 }
 
 // Contains checks if a string contains a substring.
@@ -59,8 +59,8 @@ func Split(s, delimiter string) []string {
 }
 
 // Join concatenates elements of a string slice into a single string using a separator.
-func Join(strs []string, separator string) string {
-	return strings.Join(strs, separator)
+func Join(separator string, s ...string) string {
+	return strings.Join(s, separator)
 }
 
 // Repeat returns a new string consisting of count copies of the input string.
