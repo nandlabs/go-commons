@@ -171,6 +171,10 @@ const (
 	GraveAccentChar = '`'
 	// PipeChar = '|'
 	PipeChar = '|'
+	//WhiteSpace char
+	WhiteSpaceChar  = ' '
+	NewLineChar     = '\n'
+	CarriageRtnChar = '\r'
 
 	// AUpperStr = "A"
 	AUpperStr = "A"
@@ -342,6 +346,11 @@ const (
 	// PipeStr = "|"
 	PipeStr = "|"
 	// EmptyStr = ""
-	EmptyStr      = ""
+	EmptyStr = ""
+	//WhiteSpace String
 	WhiteSpaceStr = " "
+	// NewLine String
+	NewLineString = "\n"
+	//Carriage Return String
+	CarriageRtnString = "\r"
 )
